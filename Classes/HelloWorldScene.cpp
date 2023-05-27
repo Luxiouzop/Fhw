@@ -24,7 +24,11 @@
 
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
+#include "ui/CocosGUI.h"
+#include "cocostudio/CocoStudio.h"
 
+//using namespace ui;
+using namespace cocostudio;
 USING_NS_CC;
 
 Scene* HelloWorld::createScene()
@@ -48,7 +52,7 @@ bool HelloWorld::init()
     {
         return false;
     }
-
+    /*
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -114,7 +118,16 @@ bool HelloWorld::init()
 
         // add the sprite as a child to this layer
         this->addChild(sprite, 0);
-    }
+    }*/
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    auto startUI = GUIReader::getInstance()->widgetFromJsonFile("Map/Map.json");
+    startUI->setPosition(Vec2(0, 0));
+    startUI->setName("startUI");
+    this->addChild(startUI, 1);
+
+
+
+
     return true;
 }
 
