@@ -9,7 +9,7 @@ Scene* GameScene::createScene()
 
 bool GameScene::init()
 {
-
+	return true;
 }
 
 void GameScene::update(float delta)

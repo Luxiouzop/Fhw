@@ -10,5 +10,9 @@ Scene* MapScene::createScene()
 
 bool MapScene::init()
 {
+	return true;
+}
+
+void MapScene::update(float delta) {
 
 }
