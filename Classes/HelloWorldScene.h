@@ -26,6 +26,9 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
+#include "ui/CocosGUI.h"
+#include "SimpleAudioEngine.h"
+#include "cocostudio/CocoStudio.h"
 
 class HelloWorld : public cocos2d::Scene
 {
@@ -35,8 +38,11 @@ public:
     virtual bool init();
     
     // a selector callback
-    void menuCloseCallback(cocos2d::Ref* pSender);
-    
+    void menuCloseCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
+    void menuStartCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
+    void menuHelpCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
+    void backButtonCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
+
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
 };

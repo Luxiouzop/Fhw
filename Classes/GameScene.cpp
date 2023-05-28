@@ -2,8 +2,11 @@
 #include "SimpleAudioEngine.h"
 USING_NS_CC;
 
-Scene* GameScene::createScene()
+int mapno = 0;
+
+Scene* GameScene::createScene(int s)
 {
+	mapno = s;
 	return GameScene::create();
 }
 

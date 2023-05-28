@@ -6,7 +6,7 @@
 class GameScene :public cocos2d::Scene
 {
 public:
-	static cocos2d::Scene* createScene();
+	static cocos2d::Scene* createScene(int s);
 	virtual bool init();
 	CREATE_FUNC(GameScene);
 	void update(float delta);

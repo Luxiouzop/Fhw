@@ -23,11 +23,12 @@
  ****************************************************************************/
 
 #include "HelloWorldScene.h"
+#include "MapScene.h"
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
 #include "cocostudio/CocoStudio.h"
 
-//using namespace ui;
+using namespace cocos2d::ui;
 using namespace cocostudio;
 USING_NS_CC;
 
@@ -120,27 +121,92 @@ bool HelloWorld::init()
         this->addChild(sprite, 0);
     }*/
     auto visibleSize = Director::getInstance()->getVisibleSize();
-    auto startUI = GUIReader::getInstance()->widgetFromJsonFile("Map/Map.json");
-    startUI->setPosition(Vec2(0, 0));
+    auto startUI = GUIReader::getInstance()->widgetFromJsonFile("LOGIN/LOGIN.json");
+    //startUI->setPosition(Vec2(259, 159));
     startUI->setName("startUI");
     this->addChild(startUI, 1);
-
-
-
+    auto exitButton = (Button*)startUI->getChildByName("exit_button");
+    exitButton->addTouchEventListener(CC_CALLBACK_2(HelloWorld::menuCloseCallback, this));
+    auto startButton = (Button*)startUI->getChildByName("start_button");
+    startButton->addTouchEventListener(CC_CALLBACK_2(HelloWorld::menuStartCallback, this));
+    auto helpButton = (Button*)startUI->getChildByName("help_button");
+    helpButton->addTouchEventListener(CC_CALLBACK_2(HelloWorld::menuHelpCallback, this));
 
     return true;
 }
 
 
-void HelloWorld::menuCloseCallback(Ref* pSender)
+void HelloWorld::menuCloseCallback(Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
 {
     //Close the cocos2d-x game scene and quit the application
-    Director::getInstance()->end();
 
-    /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() as given above,instead trigger a custom event created in RootViewController.mm as below*/
-
-    //EventCustom customEndEvent("game_scene_close_event");
-    //_eventDispatcher->dispatchEvent(&customEndEvent);
-
-
+    switch (type)
+    {
+    case cocos2d::ui::Widget::TouchEventType::BEGAN:
+        break;
+    case cocos2d::ui::Widget::TouchEventType::MOVED:
+        break;
+    case cocos2d::ui::Widget::TouchEventType::ENDED:
+        Director::getInstance()->end();
+        break;
+    case cocos2d::ui::Widget::TouchEventType::CANCELED:
+        break;
+    default:
+        break;
+    }
+}
+void HelloWorld::menuStartCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+{
+    switch (type)
+    {
+    case cocos2d::ui::Widget::TouchEventType::BEGAN:
+        break;
+    case cocos2d::ui::Widget::TouchEventType::MOVED:
+        break;
+    case cocos2d::ui::Widget::TouchEventType::ENDED:
+        Director::getInstance()->replaceScene(TransitionFade::create(0.75, MapScene::createScene()));
+        break;
+    case cocos2d::ui::Widget::TouchEventType::CANCELED:
+        break;
+    default:
+        break;
+    }
+}
+void HelloWorld::menuHelpCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+{
+    auto helpUI = GUIReader::getInstance()->widgetFromJsonFile("LOGIN/HELP.json");
+    auto backButton = (Button*)helpUI->getChildByName("back_button");
+    switch (type)
+    {
+    case cocos2d::ui::Widget::TouchEventType::BEGAN:
+        break;
+    case cocos2d::ui::Widget::TouchEventType::MOVED:
+        break;
+    case cocos2d::ui::Widget::TouchEventType::ENDED:
+        this->addChild(helpUI, 2);
+        helpUI->setName("HELP");
+        backButton->addTouchEventListener(CC_CALLBACK_2(HelloWorld::backButtonCallback, this));
+        break;
+    case cocos2d::ui::Widget::TouchEventType::CANCELED:
+        break;
+    default:
+        break;
+    }
+}
+void HelloWorld::backButtonCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+{
+    switch (type)
+    {
+    case cocos2d::ui::Widget::TouchEventType::BEGAN:
+        break;
+    case cocos2d::ui::Widget::TouchEventType::MOVED:
+        break;
+    case cocos2d::ui::Widget::TouchEventType::ENDED:
+        this->removeChildByName("HELP");
+        break;
+    case cocos2d::ui::Widget::TouchEventType::CANCELED:
+        break;
+    default:
+        break;
+    }
 }
