@@ -1,0 +1,323 @@
+{
+  "content_scale": 1.0,
+  "armature_data": [
+    {
+      "strVersion": "1.2.0.0",
+      "version": 1.2,
+      "name": "bow",
+      "bone_data": [
+        {
+          "name": "Layer10",
+          "parent": "",
+          "x": 105.03822326660156,
+          "y": -229.65669250488281,
+          "z": 4,
+          "cX": 1.70000017,
+          "cY": 1.0,
+          "kX": -1.6006937,
+          "kY": 1.6006937,
+          "arrow_x": 133.36761474609375,
+          "arrow_y": 3.0739320209249854E-06,
+          "effectbyskeleton": true,
+          "display_data": [
+            {
+              "name": "xian.png",
+              "displayType": 0,
+              "skin_data": [
+                {
+                  "x": -4.60675049,
+                  "y": -4.72195435,
+                  "cX": 1.0,
+                  "cY": 1.0,
+                  "kX": 0.5280745,
+                  "kY": -0.528074443
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Layer13",
+          "parent": "",
+          "x": 90.638069152832031,
+          "y": 251.9434814453125,
+          "z": 3,
+          "cX": 1.90000021,
+          "cY": 1.0,
+          "kX": 1.557524,
+          "kY": -1.557524,
+          "arrow_x": 133.1851806640625,
+          "arrow_y": -1.3552609743783251E-05,
+          "effectbyskeleton": true,
+          "display_data": [
+            {
+              "name": "xian.png",
+              "displayType": 0,
+              "skin_data": [
+                {
+                  "x": -2.13995361,
+                  "y": -9.187813,
+                  "cX": 0.7567892,
+                  "cY": 0.9336567,
+                  "kX": 0.350236773,
+                  "kY": -0.6879632
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Layer4",
+          "parent": "",
+          "x": 92.238052368164062,
+          "y": -15.25656795501709,
+          "z": 2,
+          "cX": 1.0,
+          "cY": 1.0,
+          "kX": -0.00360304723,
+          "kY": 0.00360304723,
+          "arrow_x": 245.46844482421875,
+          "arrow_y": 3.842659862129949E-05,
+          "effectbyskeleton": true,
+          "display_data": [
+            {
+              "name": "gong1.1.png",
+              "displayType": 0,
+              "skin_data": [
+                {
+                  "x": -0.4901657,
+                  "y": 12.8902359,
+                  "cX": 1.0,
+                  "cY": 1.0,
+                  "kX": -1.0896579,
+                  "kY": 1.0896579
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Layer24",
+          "parent": "",
+          "x": 91.919464111328125,
+          "y": -17.776874542236328,
+          "z": 1,
+          "cX": 1.0,
+          "cY": 1.0,
+          "kX": -12.5843182,
+          "kY": 12.5843182,
+          "arrow_x": 385.01956176757812,
+          "arrow_y": -2.7443442377261817E-05,
+          "effectbyskeleton": true,
+          "display_data": [
+            {
+              "name": "jian.png",
+              "displayType": 0,
+              "skin_data": [
+                {
+                  "x": 23.2066956,
+                  "y": 6.10789,
+                  "cX": 1.0,
+                  "cY": 1.0,
+                  "kX": 3.663085,
+                  "kY": 2.6201
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "animation_data": [
+    {
+      "name": "bow",
+      "mov_data": [
+        {
+          "name": "ready",
+          "dr": 31,
+          "lp": false,
+          "to": 0,
+          "drTW": 0,
+          "twE": 0,
+          "sc": 1.0,
+          "mov_bone_data": [
+            {
+              "name": "Layer10",
+              "dl": 0.0,
+              "frame_data": [
+                {
+                  "dI": 0,
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0,
+                  "cX": 1.0,
+                  "cY": 1.0,
+                  "kX": 0.0,
+                  "kY": 0.0,
+                  "fi": 0,
+                  "twE": 0,
+                  "tweenFrame": true
+                },
+                {
+                  "dI": 0,
+                  "x": -154.80003356933594,
+                  "y": 6.93328857421875,
+                  "z": 0,
+                  "cX": 1.30000007,
+                  "cY": 1.0,
+                  "kX": -0.6177442,
+                  "kY": 0.6177442,
+                  "fi": 30,
+                  "twE": 0,
+                  "tweenFrame": true
+                }
+              ]
+            },
+            {
+              "name": "Layer13",
+              "dl": 0.0,
+              "frame_data": [
+                {
+                  "dI": 0,
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0,
+                  "cX": 1.0,
+                  "cY": 1.0,
+                  "kX": 0.0,
+                  "kY": 0.0,
+                  "fi": 0,
+                  "twE": 0,
+                  "tweenFrame": true,
+                  "color": {
+                    "a": 255,
+                    "r": 255,
+                    "g": 255,
+                    "b": 255
+                  }
+                },
+                {
+                  "dI": 0,
+                  "x": -158.0003662109375,
+                  "y": -53.199996948242188,
+                  "z": 0,
+                  "cX": 2.10000014,
+                  "cY": 1.0,
+                  "kX": 0.575391054,
+                  "kY": -0.575391054,
+                  "fi": 30,
+                  "twE": 0,
+                  "tweenFrame": true,
+                  "color": {
+                    "a": 255,
+                    "r": 255,
+                    "g": 255,
+                    "b": 255
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Layer4",
+              "dl": 0.0,
+              "frame_data": [
+                {
+                  "dI": 0,
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0,
+                  "cX": 1.0,
+                  "cY": 1.0,
+                  "kX": 0.0,
+                  "kY": 0.0,
+                  "fi": 0,
+                  "twE": 0,
+                  "tweenFrame": true
+                }
+              ]
+            },
+            {
+              "name": "Layer24",
+              "dl": 0.0,
+              "frame_data": [
+                {
+                  "dI": 0,
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0,
+                  "cX": 1.0,
+                  "cY": 1.0,
+                  "kX": 0.0,
+                  "kY": 0.0,
+                  "fi": 0,
+                  "twE": 0,
+                  "tweenFrame": true
+                },
+                {
+                  "dI": 0,
+                  "x": -170.0,
+                  "y": 0.0,
+                  "z": 0,
+                  "cX": 1.0,
+                  "cY": 1.0,
+                  "kX": 0.0,
+                  "kY": 0.0,
+                  "fi": 30,
+                  "twE": 0,
+                  "tweenFrame": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "texture_data": [
+    {
+      "name": "gong",
+      "width": 1024.0,
+      "height": 640.0,
+      "pX": 0.5,
+      "pY": 0.5,
+      "plistFile": ""
+    },
+    {
+      "name": "gong1",
+      "width": 1024.0,
+      "height": 640.0,
+      "pX": 0.5,
+      "pY": 0.5,
+      "plistFile": ""
+    },
+    {
+      "name": "jian",
+      "width": 795.0,
+      "height": 444.0,
+      "pX": 0.5,
+      "pY": 0.5,
+      "plistFile": ""
+    },
+    {
+      "name": "xian",
+      "width": 249.0,
+      "height": 142.0,
+      "pX": 0.5,
+      "pY": 0.5,
+      "plistFile": ""
+    },
+    {
+      "name": "gong1.1",
+      "width": 1012.0,
+      "height": 575.0,
+      "pX": 0.5,
+      "pY": 0.5,
+      "plistFile": ""
+    }
+  ],
+  "config_file_path": [
+    "bow0.plist",
+    "bow1.plist"
+  ]
+}
