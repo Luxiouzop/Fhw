@@ -37,6 +37,10 @@ public:
 	void onTouchMove(Touch* touch, Event* unused_event);
 	void addTarget();
 	void removeTarget(Sprite* target);
+	void menuquitCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
+	void menupauseCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
+	void menubackCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
+	void menuquitgameCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
 
 private:
 	Armature* m_bow;
@@ -44,6 +48,7 @@ private:
 	float wind;
 	Vector<Sprite*> targetVector;
 	int playerScore;
+	bool ispause;
 };
 
 #endif // !_Game_Scene_H

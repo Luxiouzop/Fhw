@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "MapScene.h"
 #include "SimpleAudioEngine.h"
 USING_NS_CC;
 
@@ -13,6 +14,35 @@ Scene* GameScene::createScene(int s)
 bool GameScene::init()
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
+
+	// UI界面
+	auto gameUI = GUIReader::getInstance()->widgetFromJsonFile("gaming/gaming_1.json");
+	this->addChild(gameUI, 12);
+	gameUI->setName("gameUI");
+	gameUI->getChildByName("quitLabel")->setVisible(false);
+	gameUI->getChildByName("textbox")->setVisible(false);
+	gameUI->getChildByName("quit_back_to_game")->setVisible(false);
+	gameUI->getChildByName("pause_back_to_game")->setVisible(false);
+	gameUI->getChildByName("sure_to_quit")->setVisible(false);
+
+	auto pauseButton = (Button*)gameUI->getChildByName("pause_button");
+	pauseButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menupauseCallback, this));
+
+	auto pausetBackButton = (Button*)gameUI->getChildByName("pause_back_to_game");
+	pausetBackButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menubackCallback, this));
+
+	auto quitButton = (Button*)gameUI->getChildByName("quit_button");
+	quitButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menuquitCallback, this));
+
+	auto quitBackButton = (Button*)gameUI->getChildByName("quit_back_to_game");
+	quitBackButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menubackCallback, this));
+
+	auto quitSureButton = (Button*)gameUI->getChildByName("sure_to_quit");
+	quitSureButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menuquitgameCallback, this));
+
+	auto strengthBar = (LoadingBar*)gameUI->getChildByName("strength");
+	strengthBar->setPercent(0.0);
+	ispause = false;
 
 	// 弓
 	ArmatureDataManager::getInstance()->addArmatureFileInfo("Export/bow.ExportJson");
@@ -71,7 +101,7 @@ bool GameScene::init()
 void GameScene::update(float delta)
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
-	if (playerArrow.islegal == false)
+	if (playerArrow.islegal == false&&!ispause)
 	{
 		// 箭矢移动、旋转
 		playerArrow.arrow->setPosition(playerArrow.arrow->getPosition() + 0.1 * playerArrow.velocity);
@@ -120,7 +150,7 @@ void GameScene::update(float delta)
 
 void GameScene::onTouchEnd(Touch* touch, Event* unused_event)
 {
-	if (playerArrow.islegal == true)
+	if (playerArrow.islegal == true&&!ispause)
 	{
 		playerArrow.point2 = touch->getLocation();
 		playerArrow.velocity = playerArrow.point1 - playerArrow.point2;
@@ -137,7 +167,7 @@ void GameScene::onTouchEnd(Touch* touch, Event* unused_event)
 
 bool GameScene::onTouchBegin(Touch* touch, Event* unused_event)
 {
-	if (playerArrow.islegal == true)
+	if (playerArrow.islegal == true&&!ispause)
 	{
 		playerArrow.point1 = touch->getLocation();
 		m_bow->getAnimation()->play("ready");
@@ -152,9 +182,16 @@ bool GameScene::onTouchBegin(Touch* touch, Event* unused_event)
 
 void GameScene::onTouchMove(Touch* touch, Event* unused_event)
 {
-	if (playerArrow.islegal == true)
+	if (playerArrow.islegal == true&&!ispause)
 	{
 		auto point = touch->getLocation();
+		auto strength = (playerArrow.point1 - point).getLength();
+		strength /= (2 * playerArrow.maxV) / 100;
+		if (strength > 100)
+			strength = 100;
+		auto strengthBar = (LoadingBar*)this->getChildByName("gameUI")->getChildByName("strength");
+		strengthBar->setPercent(strength);
+		
 		m_bow->setRotation(-CC_RADIANS_TO_DEGREES((playerArrow.point1 - point).getAngle()));
 	}
 }
@@ -186,5 +223,87 @@ void GameScene::removeTarget(Sprite* target)
 {
 	this->removeChild(target);
 	targetVector.eraseObject(target);
+}
+
+void GameScene::menuquitCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		ispause = true;
+		this->getChildByName("gameUI")->getChildByName("quit_back_to_game")->setVisible(true);
+		this->getChildByName("gameUI")->getChildByName("quitLabel")->setVisible(true);
+		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setVisible(true);
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void GameScene::menupauseCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		ispause = true;
+		this->getChildByName("gameUI")->getChildByName("pause_back_to_game")->setVisible(true);
+		this->getChildByName("gameUI")->getChildByName("textbox")->setVisible(true);
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void GameScene::menubackCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		ispause = false;
+		this->getChildByName("gameUI")->getChildByName("pause_back_to_game")->setVisible(false);
+		this->getChildByName("gameUI")->getChildByName("textbox")->setVisible(false);
+		this->getChildByName("gameUI")->getChildByName("quit_back_to_game")->setVisible(false);
+		this->getChildByName("gameUI")->getChildByName("quitLabel")->setVisible(false);
+		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setVisible(false);
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void GameScene::menuquitgameCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		Director::getInstance()->replaceScene(TransitionFade::create(0.75, MapScene::createScene()));
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
 }
 
