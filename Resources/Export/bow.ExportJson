@@ -136,7 +136,7 @@
         {
           "name": "ready",
           "dr": 31,
-          "lp": true,
+          "lp": false,
           "to": 0,
           "drTW": 0,
           "twE": 0,
@@ -273,7 +273,7 @@
         },
         {
           "name": "reset",
-          "dr": 10,
+          "dr": 11,
           "lp": false,
           "to": 0,
           "drTW": 0,
