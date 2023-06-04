@@ -162,6 +162,7 @@ void GameScene::onTouchEnd(Touch* touch, Event* unused_event)
 		CCLOG("%f,%f", playerArrow.velocity.x, playerArrow.velocity.y);
 		playerArrow.islegal = false;
 		playerArrow.arrow->setVisible(true);
+		m_bow->getAnimation()->play("reset");
 	}
 }
 
