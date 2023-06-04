@@ -2,6 +2,12 @@
 #define _Game_Scene_H
 
 #include "cocos2d.h"
+#include "cocostudio/CocoStudio.h"
+#include "ui/CocosGUI.h"
+USING_NS_CC;
+using namespace cocos2d;
+using namespace cocostudio;
+using namespace cocos2d::ui;
 
 class GameScene :public cocos2d::Scene
 {
@@ -10,8 +16,11 @@ public:
 	virtual bool init();
 	CREATE_FUNC(GameScene);
 	void update(float delta);
-private:
+	void onTouchEnd(Touch* touch, Event* unused_event);
+	bool onTouchBegin(Touch* touch, Event* unused_event);
 
+private:
+	Armature* m_bow;
 
 
 
