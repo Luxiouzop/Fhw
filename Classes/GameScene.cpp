@@ -74,9 +74,16 @@ bool GameScene::init()
 	playerScore = 0;
 	auto scoreLabel = Label::createWithTTF(StringUtils::format("Score:%d", playerScore), "fonts/arial.ttf", 24);
 	scoreLabel->setName("scoreLabel");
-	scoreLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - 100));
+	scoreLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - 200));
 	scoreLabel->setTextColor(Color4B::YELLOW);
 	this->addChild(scoreLabel, 11);
+	// 计时
+	time = 10;
+	auto timeLabel = Label::createWithTTF(StringUtils::format("%d", (int)time), "fonts/arial.ttf", 36);
+	timeLabel->setName("timeLabel");
+	timeLabel->setTextColor(Color4B::YELLOW);
+	timeLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - 50));
+	this->addChild(timeLabel, 11);
 
 	// 箭靶
 	addTarget();
@@ -107,9 +114,14 @@ void GameScene::update(float delta)
 		playerArrow.arrow->setPosition(playerArrow.arrow->getPosition() + 0.1 * playerArrow.velocity);
 		playerArrow.arrow->setRotation(-CC_RADIANS_TO_DEGREES(playerArrow.velocity.getAngle()));
 		// 每次更新根据 风向、重力 修正速度
-		playerArrow.velocity.y -= 1;
-		if (playerArrow.velocity.x - 0.01-wind > 0) {
-			playerArrow.velocity.x -= 0.05 + wind;
+		auto resisty = 0.00015 * pow(playerArrow.velocity.y, 2);
+		playerArrow.velocity.y -= 1.5 + resisty;
+		auto resistx = 0.00015 * pow(playerArrow.velocity.x, 2);
+		
+		CCLOG("velocityx:%f", playerArrow.velocity.x);
+		CCLOG("Resistx:%f", resistx);
+		if (playerArrow.velocity.x - resistx -wind > 0) {
+			playerArrow.velocity.x -= resistx + wind;
 		}
 
 		// 检测箭矢与箭靶碰撞
@@ -122,8 +134,15 @@ void GameScene::update(float delta)
 				playerArrow.arrow->setPosition(m_bow->getPosition());
 				playerArrow.islegal = true;
 				// 得分增加
+				auto score = 0;
+				if (abs(target->getPositionX() - TargetField1)<0.01)
+					score = 1;
+				else if (abs(target->getPositionX() - TargetField2) < 0.01)
+					score = 2;
+				else if (abs(target->getPositionX() - TargetField3) < 0.01)
+					score = 3;
+				showScoreTips(score, target->getPosition());
 				auto scoreLabel = (Label*)this->getChildByName("scoreLabel");
-				playerScore += 1;
 				scoreLabel->setString(StringUtils::format("Score:%d", playerScore));
 				// 箭靶命中后消失
 				auto actionDown = CallFunc::create(CC_CALLBACK_0(GameScene::removeTarget, this, target));
@@ -145,7 +164,24 @@ void GameScene::update(float delta)
 			playerArrow.islegal = true;
 		}
 	}
-		
+	if (!ispause) 
+	{
+		time -= delta;
+		auto timeLabel = (Label*)this->getChildByName("timeLabel");
+		timeLabel->setString(StringUtils::format("%d", (int)time));
+		if (time <= 0)
+			ispause = true;
+	}
+	if(time<=0)
+	{
+		auto gameoverLabel = Label::createWithTTF(StringUtils::format("Game over!"), "fonts/arial.ttf", 64);
+		gameoverLabel->setTextColor(Color4B::RED);
+		gameoverLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 + 100));
+		this->addChild(gameoverLabel, 12);
+		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 25));
+		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setVisible(true);
+	}
+
 }
 
 void GameScene::onTouchEnd(Touch* touch, Event* unused_event)
@@ -225,6 +261,26 @@ void GameScene::removeTarget(Sprite* target)
 	this->removeChild(target);
 	targetVector.eraseObject(target);
 }
+
+void GameScene::flyout(Label* label) {
+	label->setVisible(false);
+	label->removeFromParent();
+}
+
+void GameScene::showScoreTips(int score,Vec2 position)
+{
+	playerScore += score;
+	auto label = Label::createWithTTF(StringUtils::format("+%d", score), "fonts/arial.ttf", 24);
+	label->setTextColor(Color4B::GREEN);
+	label->setPosition(position);
+	this->addChild(label, 12);
+	label->runAction(Sequence::create(
+		MoveBy::create(0.75f, Vec2(0, 30)),
+		CallFunc::create(CC_CALLBACK_0(GameScene::flyout, this, label)),
+		NULL
+	));
+}
+
 
 void GameScene::menuquitCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
 {

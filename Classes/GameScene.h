@@ -37,6 +37,8 @@ public:
 	void onTouchMove(Touch* touch, Event* unused_event);
 	void addTarget();
 	void removeTarget(Sprite* target);
+	void flyout(Label* label);
+	void showScoreTips(int score, Vec2 position);
 	void menuquitCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
 	void menupauseCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
 	void menubackCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
@@ -49,6 +51,7 @@ private:
 	Vector<Sprite*> targetVector;
 	int playerScore;
 	bool ispause;
+	double time;
 };
 
 #endif // !_Game_Scene_H
