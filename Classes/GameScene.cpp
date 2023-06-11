@@ -20,29 +20,37 @@ bool GameScene::init()
 	this->addChild(gameUI, 12);
 	gameUI->setName("gameUI");
 	gameUI->getChildByName("quitLabel")->setVisible(false);
-	gameUI->getChildByName("textbox")->setVisible(false);
 	gameUI->getChildByName("quit_back_to_game")->setVisible(false);
-	gameUI->getChildByName("pause_back_to_game")->setVisible(false);
+	//gameUI->getChildByName("pause_back_to_game")->setVisible(false);
+	//gameUI->getChildByName("textbox")->setVisible(false);
 	gameUI->getChildByName("sure_to_quit")->setVisible(false);
-
+	// 暂停按钮
 	auto pauseButton = (Button*)gameUI->getChildByName("pause_button");
 	pauseButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menupauseCallback, this));
-
+	// 暂停界面的返回按钮
 	auto pausetBackButton = (Button*)gameUI->getChildByName("pause_back_to_game");
 	pausetBackButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menubackCallback, this));
-
+	// 退出按钮
 	auto quitButton = (Button*)gameUI->getChildByName("quit_button");
 	quitButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menuquitCallback, this));
-
+	// 退出界面的返回按钮
 	auto quitBackButton = (Button*)gameUI->getChildByName("quit_back_to_game");
 	quitBackButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menubackCallback, this));
-
+	// 退出界面的确定按钮
 	auto quitSureButton = (Button*)gameUI->getChildByName("sure_to_quit");
 	quitSureButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menuquitgameCallback, this));
-
+	// 力度条
 	auto strengthBar = (LoadingBar*)gameUI->getChildByName("strength");
 	strengthBar->setPercent(0.0);
-	ispause = false;
+	// 游戏暂停标志
+	ispause = true;
+	// 游戏结束标签
+	auto gameoverLabel = Label::createWithTTF(StringUtils::format("Game over!"), "fonts/arial.ttf", 64);
+	gameoverLabel->setTextColor(Color4B::RED);
+	gameoverLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 + 100));
+	gameoverLabel->setName("gameoverLabel");
+	gameoverLabel->setVisible(false);
+	this->addChild(gameoverLabel, 12);
 
 	// 弓
 	ArmatureDataManager::getInstance()->addArmatureFileInfo("Export/bow.ExportJson");
@@ -63,6 +71,18 @@ bool GameScene::init()
 
 	// 风速
 	wind = 0;
+	auto windLabel = Label::createWithTTF(StringUtils::format("no wind"), "fonts/arial.ttf", 30);
+	windLabel->setTextColor(Color4B::YELLOW);
+	windLabel->setPosition(visibleSize.width / 2, visibleSize.height - 100);
+	windLabel->setName("windLabel");
+	this->addChild(windLabel, 11);
+	auto ss = Sequence::create(
+		CallFunc::create(CC_CALLBACK_0(GameScene::randomWind, this)),
+		DelayTime::create(10),
+		NULL
+	);
+	auto act = RepeatForever::create(ss);
+	this->runAction(act);
 
 	// 背景云
 	auto cloud1 = Sprite::create("cloud.png");
@@ -72,13 +92,14 @@ bool GameScene::init()
 
 	// 得分
 	playerScore = 0;
-	auto scoreLabel = Label::createWithTTF(StringUtils::format("Score:%d", playerScore), "fonts/arial.ttf", 24);
+	maxScore = 25;
+	auto scoreLabel = Label::createWithTTF(StringUtils::format("Score:%d (Target:%d)", playerScore, maxScore), "fonts/arial.ttf", 24);
 	scoreLabel->setName("scoreLabel");
-	scoreLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - 200));
+	scoreLabel->setPosition(Vec2(150, visibleSize.height - 150));
 	scoreLabel->setTextColor(Color4B::YELLOW);
 	this->addChild(scoreLabel, 11);
 	// 计时
-	time = 10;
+	time = 60;
 	auto timeLabel = Label::createWithTTF(StringUtils::format("%d", (int)time), "fonts/arial.ttf", 36);
 	timeLabel->setName("timeLabel");
 	timeLabel->setTextColor(Color4B::YELLOW);
@@ -99,6 +120,41 @@ bool GameScene::init()
 	listener->onTouchMoved = CC_CALLBACK_2(GameScene::onTouchMove, this);
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 
+	// 键盘回调
+	bow_move = 0;
+	auto keyListener = EventListenerKeyboard::create();
+	keyListener->onKeyPressed = [&](EventKeyboard::KeyCode code, Event* e) {
+		if (!ispause) {
+			switch (code)
+			{
+			case cocos2d::EventKeyboard::KeyCode::KEY_W:
+				bow_move = 1;
+				break;
+			case cocos2d::EventKeyboard::KeyCode::KEY_S:
+				bow_move = -1;
+				break;
+			default:
+				break;
+			}
+		}
+	};
+	keyListener->onKeyReleased= [&](EventKeyboard::KeyCode code, Event* e) {
+		if (!ispause) {
+			switch (code)
+			{
+			case cocos2d::EventKeyboard::KeyCode::KEY_W:
+				bow_move = 0;
+				break;
+			case cocos2d::EventKeyboard::KeyCode::KEY_S:
+				bow_move = 0;
+				break;
+			default:
+				break;
+			}
+		}
+	};
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(keyListener, this);
+
 	// update
 	this->scheduleUpdate();
 
@@ -108,6 +164,21 @@ bool GameScene::init()
 void GameScene::update(float delta)
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
+
+	// 弓移动
+	if (!ispause)
+	{
+		if (bow_move == 1&&m_bow->getPositionY()+4<450)
+		{
+			m_bow->setPositionY(m_bow->getPositionY() + 4);
+		}
+		else if (bow_move == -1 && m_bow->getPositionY() - 4 > 64)
+		{
+			m_bow->setPositionY(m_bow->getPositionY() - 4);
+		}
+	}
+
+	// 箭矢移动
 	if (playerArrow.islegal == false&&!ispause)
 	{
 		// 箭矢移动、旋转
@@ -120,8 +191,17 @@ void GameScene::update(float delta)
 		
 		CCLOG("velocityx:%f", playerArrow.velocity.x);
 		CCLOG("Resistx:%f", resistx);
-		if (playerArrow.velocity.x - resistx -wind > 0) {
-			playerArrow.velocity.x -= resistx + wind;
+		if (playerArrow.velocity.x - resistx -wind > 0&&wind==1) 
+		{
+			playerArrow.velocity.x -= 1.25 * resistx;
+		}
+		else if (wind == -1)
+		{
+			playerArrow.velocity.x -= 0.75 * resistx;
+		}
+		else if (wind == 0)
+		{
+			playerArrow.velocity.x -= resistx;
 		}
 
 		// 检测箭矢与箭靶碰撞
@@ -141,9 +221,9 @@ void GameScene::update(float delta)
 					score = 2;
 				else if (abs(target->getPositionX() - TargetField3) < 0.01)
 					score = 3;
-				showScoreTips(score, target->getPosition());
+				showScoreTips(score, target->getPosition(),Color4B::GREEN);
 				auto scoreLabel = (Label*)this->getChildByName("scoreLabel");
-				scoreLabel->setString(StringUtils::format("Score:%d", playerScore));
+				scoreLabel->setString(StringUtils::format("Score:%d (Target:%d)", playerScore, maxScore));
 				// 箭靶命中后消失
 				auto actionDown = CallFunc::create(CC_CALLBACK_0(GameScene::removeTarget, this, target));
 				target->runAction(actionDown);
@@ -164,6 +244,7 @@ void GameScene::update(float delta)
 			playerArrow.islegal = true;
 		}
 	}
+	// 倒计时
 	if (!ispause) 
 	{
 		time -= delta;
@@ -172,14 +253,19 @@ void GameScene::update(float delta)
 		if (time <= 0)
 			ispause = true;
 	}
-	if(time<=0)
+	// 游戏结束
+	if(time<=0|| playerScore >= maxScore)
 	{
-		auto gameoverLabel = Label::createWithTTF(StringUtils::format("Game over!"), "fonts/arial.ttf", 64);
-		gameoverLabel->setTextColor(Color4B::RED);
-		gameoverLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 + 100));
-		this->addChild(gameoverLabel, 12);
+		auto gameoverLabel = (Label*)this->getChildByName("gameoverLabel");
+		if (playerScore >= maxScore)
+		{
+			gameoverLabel->setString("Success!");
+			gameoverLabel->setColor(Color3B::YELLOW);
+		}
+		gameoverLabel->setVisible(true);
 		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 25));
 		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setVisible(true);
+		ispause = true;
 	}
 
 }
@@ -197,6 +283,7 @@ void GameScene::onTouchEnd(Touch* touch, Event* unused_event)
 		playerArrow.velocity = playerArrow.velocity.getNormalized() * len;
 		CCLOG("%f,%f", playerArrow.velocity.x, playerArrow.velocity.y);
 		playerArrow.islegal = false;
+		playerArrow.arrow->setPosition(m_bow->getPosition());
 		playerArrow.arrow->setVisible(true);
 		m_bow->getAnimation()->play("reset");
 	}
@@ -209,6 +296,18 @@ bool GameScene::onTouchBegin(Touch* touch, Event* unused_event)
 		playerArrow.point1 = touch->getLocation();
 		m_bow->getAnimation()->play("ready");
 		return true;
+	}
+	else if (playerArrow.islegal == false && !ispause)
+	{
+		auto label = Label::createWithTTF("X", "fonts/arial.ttf", 36);
+		label->setTextColor(Color4B::RED);
+		this->addChild(label, 11);
+		label->setPosition(touch->getLocation());
+		label->runAction(Sequence::create(
+			DelayTime::create(0.5),
+			CallFunc::create(CC_CALLBACK_0(GameScene::flyout, this, label)),
+			NULL
+		));
 	}
 	else 
 	{
@@ -267,11 +366,30 @@ void GameScene::flyout(Label* label) {
 	label->removeFromParent();
 }
 
-void GameScene::showScoreTips(int score,Vec2 position)
+void GameScene::randomWind()
+{
+	wind = random(-1, 1);
+	auto windLabel = (Label*)this->getChildByName("windLabel");
+	if (wind == 1)
+	{
+		windLabel->setString("headwind");
+	}
+	else if (wind == 0)
+	{
+		windLabel->setString("no wind");
+	}
+	else if (wind == -1)
+	{
+		windLabel->setString("windy");
+	}
+	CCLOG("wind:%d", wind);
+}
+
+void GameScene::showScoreTips(int score,Vec2 position,Color4B color)
 {
 	playerScore += score;
 	auto label = Label::createWithTTF(StringUtils::format("+%d", score), "fonts/arial.ttf", 24);
-	label->setTextColor(Color4B::GREEN);
+	label->setTextColor(color);
 	label->setPosition(position);
 	this->addChild(label, 12);
 	label->runAction(Sequence::create(
@@ -292,6 +410,8 @@ void GameScene::menuquitCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::Tou
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		ispause = true;
+		this->getChildByName("gameUI")->getChildByName("pause_back_to_game")->setVisible(false);
+		this->getChildByName("gameUI")->getChildByName("textbox")->setVisible(false);
 		this->getChildByName("gameUI")->getChildByName("quit_back_to_game")->setVisible(true);
 		this->getChildByName("gameUI")->getChildByName("quitLabel")->setVisible(true);
 		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setVisible(true);
@@ -313,6 +433,9 @@ void GameScene::menupauseCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::To
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		ispause = true;
+		this->getChildByName("gameUI")->getChildByName("quit_back_to_game")->setVisible(false);
+		this->getChildByName("gameUI")->getChildByName("quitLabel")->setVisible(false);
+		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setVisible(false);
 		this->getChildByName("gameUI")->getChildByName("pause_back_to_game")->setVisible(true);
 		this->getChildByName("gameUI")->getChildByName("textbox")->setVisible(true);
 		break;

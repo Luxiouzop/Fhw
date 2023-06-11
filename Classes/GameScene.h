@@ -38,7 +38,8 @@ public:
 	void addTarget();
 	void removeTarget(Sprite* target);
 	void flyout(Label* label);
-	void showScoreTips(int score, Vec2 position);
+	void randomWind();
+	void showScoreTips(int score, Vec2 position, Color4B color);
 	void menuquitCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
 	void menupauseCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
 	void menubackCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
@@ -47,11 +48,13 @@ public:
 private:
 	Armature* m_bow;
 	ArrowState playerArrow;
-	float wind;
+	int wind;
 	Vector<Sprite*> targetVector;
 	int playerScore;
+	int maxScore;
 	bool ispause;
 	double time;
+	int bow_move;
 };
 
 #endif // !_Game_Scene_H
