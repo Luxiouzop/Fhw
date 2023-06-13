@@ -14,7 +14,14 @@ Scene* GameScene::createScene(int s)
 bool GameScene::init()
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
-
+	// 音乐音效预加载
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/click2.wav");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/pull_bow.wav");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/shoot2.wav");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/hit.wav");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/wind.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/bonus.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/error.mp3");
 	// UI界面
 	auto gameUI = GUIReader::getInstance()->widgetFromJsonFile("gaming/gaming_1.json");
 	this->addChild(gameUI, 12);
@@ -57,7 +64,7 @@ bool GameScene::init()
 	m_bow = Armature::create("bow");
 	this->addChild(m_bow, 10);
 	m_bow->setScale(0.05);
-	m_bow->setPosition(Vec2(100, visibleSize.height / 2));
+	m_bow->setPosition(Vec2(100, 64));
 	//m_bow->getAnimation()->play("ready");
 
 	// 箭矢
@@ -168,7 +175,7 @@ void GameScene::update(float delta)
 	// 弓移动
 	if (!ispause)
 	{
-		if (bow_move == 1&&m_bow->getPositionY()+4<450)
+		if (bow_move == 1&&m_bow->getPositionY()+4<475)
 		{
 			m_bow->setPositionY(m_bow->getPositionY() + 4);
 		}
@@ -189,8 +196,8 @@ void GameScene::update(float delta)
 		playerArrow.velocity.y -= 1.5 + resisty;
 		auto resistx = 0.00015 * pow(playerArrow.velocity.x, 2);
 		
-		CCLOG("velocityx:%f", playerArrow.velocity.x);
-		CCLOG("Resistx:%f", resistx);
+		//CCLOG("velocityx:%f", playerArrow.velocity.x);
+		//CCLOG("Resistx:%f", resistx);
 		if (playerArrow.velocity.x - resistx -wind > 0&&wind==1) 
 		{
 			playerArrow.velocity.x -= 1.25 * resistx;
@@ -209,10 +216,34 @@ void GameScene::update(float delta)
 		{
 			if (playerArrow.arrow->getBoundingBox().intersectsRect(target->getBoundingBox()))
 			{
+				//
+				auto tmp = ParticleSystem::create("shoot.plist");
+				tmp->setPosition(target->getPosition());
+				tmp->setScale(3);
+				this->addChild(tmp, 13);
+
+				CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("audio/hit.wav");
 				// 箭矢重置
-				playerArrow.arrow->setVisible(false);
-				playerArrow.arrow->setPosition(m_bow->getPosition());
-				playerArrow.islegal = true;
+				if (playerArrow.bonus == 0||playerArrow.bonus%3!=0)
+				{
+					playerArrow.arrow->setVisible(false);
+					playerArrow.arrow->setPosition(m_bow->getPosition());
+					playerArrow.islegal = true;
+					playerArrow.bonus++;
+					if (playerArrow.bonus % 3 == 0) {
+						auto bonusLabel = Label::createWithTTF(StringUtils::format("Bonus!"), "fonts/arial.ttf", 30);
+						bonusLabel->setPosition(m_bow->getPosition() + Vec2(50, 25));
+						this->addChild(bonusLabel, 11);
+						bonusLabel->runAction(MoveBy::create(1.0f, Vec2(0, 50)));
+						CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("audio/bonus.mp3");
+						bonusLabel->runAction(Sequence::create(
+							ScaleBy::create(1.0f, 2),
+							CallFunc::create(CC_CALLBACK_0(GameScene::flyout, this, bonusLabel)),
+							NULL
+						));
+					}
+				}
+				
 				// 得分增加
 				auto score = 0;
 				if (abs(target->getPositionX() - TargetField1)<0.01)
@@ -227,6 +258,8 @@ void GameScene::update(float delta)
 				// 箭靶命中后消失
 				auto actionDown = CallFunc::create(CC_CALLBACK_0(GameScene::removeTarget, this, target));
 				target->runAction(actionDown);
+				tmp->removeFromParent();
+
 				// 箭靶增加
 				auto actionAdd = CallFunc::create(CC_CALLBACK_0(GameScene::addTarget, this));
 				auto sequence = Sequence::create(DelayTime::create(0.75), actionAdd, nullptr);
@@ -242,6 +275,19 @@ void GameScene::update(float delta)
 			playerArrow.arrow->setVisible(false);
 			playerArrow.arrow->setPosition(m_bow->getPosition());
 			playerArrow.islegal = true;
+			playerArrow.bonus++;
+			if (playerArrow.bonus % 3 == 0) {
+				auto bonusLabel = Label::createWithTTF(StringUtils::format("Bonus!"), "fonts/arial.ttf", 30);
+				bonusLabel->setPosition(m_bow->getPosition() + Vec2(50, 25));
+				this->addChild(bonusLabel, 11);
+				bonusLabel->runAction(MoveBy::create(1.0f, Vec2(0, 50)));
+				CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("audio/bonus.mp3");
+				bonusLabel->runAction(Sequence::create(
+					ScaleBy::create(1.0f, 2),
+					CallFunc::create(CC_CALLBACK_0(GameScene::flyout, this, bonusLabel)),
+					NULL
+				));
+			}
 		}
 	}
 	// 倒计时
@@ -274,18 +320,21 @@ void GameScene::onTouchEnd(Touch* touch, Event* unused_event)
 {
 	if (playerArrow.islegal == true&&!ispause)
 	{
+		CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("audio/shoot2.wav");
 		playerArrow.point2 = touch->getLocation();
 		playerArrow.velocity = playerArrow.point1 - playerArrow.point2;
 		auto len = playerArrow.velocity.getLength() / 2;
 		if (len > playerArrow.maxV) {
 			len = playerArrow.maxV;
 		}
-		playerArrow.velocity = playerArrow.velocity.getNormalized() * len;
+		playerArrow.velocity = playerArrow.velocity.getNormalized() * (len+20);
 		CCLOG("%f,%f", playerArrow.velocity.x, playerArrow.velocity.y);
 		playerArrow.islegal = false;
 		playerArrow.arrow->setPosition(m_bow->getPosition());
 		playerArrow.arrow->setVisible(true);
 		m_bow->getAnimation()->play("reset");
+		auto strengthBar = (LoadingBar*)this->getChildByName("gameUI")->getChildByName("strength");
+		strengthBar->setPercent(0);
 	}
 }
 
@@ -293,12 +342,14 @@ bool GameScene::onTouchBegin(Touch* touch, Event* unused_event)
 {
 	if (playerArrow.islegal == true&&!ispause)
 	{
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/pull_bow.wav");
 		playerArrow.point1 = touch->getLocation();
 		m_bow->getAnimation()->play("ready");
 		return true;
 	}
 	else if (playerArrow.islegal == false && !ispause)
 	{
+		//CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/error.mp3");
 		auto label = Label::createWithTTF("X", "fonts/arial.ttf", 36);
 		label->setTextColor(Color4B::RED);
 		this->addChild(label, 11);
@@ -308,6 +359,7 @@ bool GameScene::onTouchBegin(Touch* touch, Event* unused_event)
 			CallFunc::create(CC_CALLBACK_0(GameScene::flyout, this, label)),
 			NULL
 		));
+		return false;
 	}
 	else 
 	{
@@ -372,15 +424,17 @@ void GameScene::randomWind()
 	auto windLabel = (Label*)this->getChildByName("windLabel");
 	if (wind == 1)
 	{
-		windLabel->setString("headwind");
+		windLabel->setString("<<<<<<");
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/wind.mp3");
 	}
 	else if (wind == 0)
 	{
-		windLabel->setString("no wind");
+		windLabel->setString("<<O>>");
 	}
 	else if (wind == -1)
 	{
-		windLabel->setString("windy");
+		windLabel->setString(">>>>>>");
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/wind.mp3");
 	}
 	CCLOG("wind:%d", wind);
 }
@@ -388,7 +442,7 @@ void GameScene::randomWind()
 void GameScene::showScoreTips(int score,Vec2 position,Color4B color)
 {
 	playerScore += score;
-	auto label = Label::createWithTTF(StringUtils::format("+%d", score), "fonts/arial.ttf", 24);
+	auto label = Label::createWithTTF(StringUtils::format("+%d", score), "fonts/Marker Felt.ttf", 24);
 	label->setTextColor(color);
 	label->setPosition(position);
 	this->addChild(label, 12);
@@ -410,6 +464,7 @@ void GameScene::menuquitCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::Tou
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		ispause = true;
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/click2.wav");
 		this->getChildByName("gameUI")->getChildByName("pause_back_to_game")->setVisible(false);
 		this->getChildByName("gameUI")->getChildByName("textbox")->setVisible(false);
 		this->getChildByName("gameUI")->getChildByName("quit_back_to_game")->setVisible(true);
@@ -433,6 +488,7 @@ void GameScene::menupauseCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::To
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		ispause = true;
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/click2.wav");
 		this->getChildByName("gameUI")->getChildByName("quit_back_to_game")->setVisible(false);
 		this->getChildByName("gameUI")->getChildByName("quitLabel")->setVisible(false);
 		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setVisible(false);
@@ -456,6 +512,7 @@ void GameScene::menubackCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::Tou
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		ispause = false;
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/click2.wav");
 		this->getChildByName("gameUI")->getChildByName("pause_back_to_game")->setVisible(false);
 		this->getChildByName("gameUI")->getChildByName("textbox")->setVisible(false);
 		this->getChildByName("gameUI")->getChildByName("quit_back_to_game")->setVisible(false);
@@ -478,6 +535,7 @@ void GameScene::menuquitgameCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget:
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/click2.wav");
 		Director::getInstance()->replaceScene(TransitionFade::create(0.75, MapScene::createScene()));
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:

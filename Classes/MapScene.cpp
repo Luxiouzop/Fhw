@@ -21,6 +21,9 @@ bool MapScene::init()
 	{
 		return false;
 	}
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/click2.wav");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/map_choose.wav");
+
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto mapUI = GUIReader::getInstance()->widgetFromJsonFile("Map/Map.json");
 	this->addChild(mapUI, 1);
@@ -46,6 +49,7 @@ void MapScene::menuBackCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::Touc
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/click2.wav");
 		Director::getInstance()->replaceScene(TransitionFade::create(0.75, HelloWorld::createScene()));
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -64,6 +68,7 @@ void MapScene::menuMap1Callback(cocos2d::Ref* pSender, cocos2d::ui::Widget::Touc
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/map_choose.wav");
 		Director::getInstance()->replaceScene(TransitionFade::create(0.75, GameScene::createScene(1)));
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:

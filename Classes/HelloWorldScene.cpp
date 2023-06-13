@@ -120,6 +120,9 @@ bool HelloWorld::init()
         // add the sprite as a child to this layer
         this->addChild(sprite, 0);
     }*/
+
+    CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/click2.wav");
+
     auto visibleSize = Director::getInstance()->getVisibleSize();
     auto startUI = GUIReader::getInstance()->widgetFromJsonFile("LOGIN/LOGIN.json");
     //startUI->setPosition(Vec2(259, 159));
@@ -131,6 +134,9 @@ bool HelloWorld::init()
     startButton->addTouchEventListener(CC_CALLBACK_2(HelloWorld::menuStartCallback, this));
     auto helpButton = (Button*)startUI->getChildByName("help_button");
     helpButton->addTouchEventListener(CC_CALLBACK_2(HelloWorld::menuHelpCallback, this));
+
+    
+
 
     return true;
 }
@@ -147,6 +153,7 @@ void HelloWorld::menuCloseCallback(Ref* pSender, cocos2d::ui::Widget::TouchEvent
     case cocos2d::ui::Widget::TouchEventType::MOVED:
         break;
     case cocos2d::ui::Widget::TouchEventType::ENDED:
+        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/click2.wav");
         Director::getInstance()->end();
         break;
     case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -164,6 +171,7 @@ void HelloWorld::menuStartCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::T
     case cocos2d::ui::Widget::TouchEventType::MOVED:
         break;
     case cocos2d::ui::Widget::TouchEventType::ENDED:
+        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/click2.wav");
         Director::getInstance()->replaceScene(TransitionFade::create(0.75, MapScene::createScene()));
         break;
     case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -183,6 +191,7 @@ void HelloWorld::menuHelpCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::To
     case cocos2d::ui::Widget::TouchEventType::MOVED:
         break;
     case cocos2d::ui::Widget::TouchEventType::ENDED:
+        CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("audio/click2.wav");
         this->addChild(helpUI, 2);
         helpUI->setName("HELP");
         backButton->addTouchEventListener(CC_CALLBACK_2(HelloWorld::backButtonCallback, this));
@@ -202,6 +211,7 @@ void HelloWorld::backButtonCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::
     case cocos2d::ui::Widget::TouchEventType::MOVED:
         break;
     case cocos2d::ui::Widget::TouchEventType::ENDED:
+        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/click2.wav");
         this->removeChildByName("HELP");
         break;
     case cocos2d::ui::Widget::TouchEventType::CANCELED:
