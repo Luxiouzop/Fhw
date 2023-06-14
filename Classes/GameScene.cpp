@@ -22,6 +22,8 @@ bool GameScene::init()
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/wind.mp3");
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/bonus.mp3");
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/error.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/win.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/lose.mp3");
 	// UI界面
 	auto gameUI = GUIReader::getInstance()->widgetFromJsonFile("gaming/gaming_1.json");
 	this->addChild(gameUI, 12);
@@ -83,19 +85,19 @@ bool GameScene::init()
 	windLabel->setPosition(visibleSize.width / 2, visibleSize.height - 100);
 	windLabel->setName("windLabel");
 	this->addChild(windLabel, 11);
-	auto ss = Sequence::create(
-		CallFunc::create(CC_CALLBACK_0(GameScene::randomWind, this)),
-		DelayTime::create(10),
-		NULL
-	);
-	auto act = RepeatForever::create(ss);
-	this->runAction(act);
+	randomWind();
+	windtime = 10;
 
 	// 背景云
 	auto cloud1 = Sprite::create("cloud.png");
 	cloud1->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
 	cloud1->setName("cloud1");
 	this->addChild(cloud1, 1);
+	auto cloud2 = Sprite::create("cloud.png");
+	cloud2->setPosition(cloud1->getPosition());
+	cloud2->setPositionX(cloud2->getPositionX() + cloud1->getContentSize().width - 1);
+	cloud2->setName("cloud2");
+	this->addChild(cloud2, 1);
 
 	// 得分
 	playerScore = 0;
@@ -165,6 +167,8 @@ bool GameScene::init()
 	// update
 	this->scheduleUpdate();
 
+
+
 	return true;
 }
 
@@ -172,6 +176,62 @@ void GameScene::update(float delta)
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
+	// 背景云移动
+	if (!ispause)
+	{
+		auto cloud1 = this->getChildByName("cloud1");
+		auto cloud2 = this->getChildByName("cloud2");
+		CCLOG("cloud1x:%f,cloud2x:%f", cloud1->getPositionX(), cloud2->getPositionX());
+		if (wind == 1)//<<<<<
+		{
+			cloud1->setPositionX(cloud1->getPositionX() - 0.25);
+			cloud2->setPositionX(cloud2->getPositionX() - 0.25);
+			if (cloud1->getPositionX() + cloud1->getContentSize().width/2 <= 0)
+			{
+				cloud1->setPositionX(cloud2->getPositionX() + cloud2->getContentSize().width - 1);
+			}
+			if (cloud2->getPositionX() + cloud2->getContentSize().width/2 <= 0)
+			{
+				cloud2->setPositionX(cloud1->getPositionX() + cloud1->getContentSize().width - 1);
+			}
+		}
+		else if (wind == -1)//>>>>>
+		{
+			cloud1->setPositionX(cloud1->getPositionX() + 0.25);
+			cloud2->setPositionX(cloud2->getPositionX() + 0.25);
+			if (cloud1->getPositionX() - cloud1->getContentSize().width/2 >= visibleSize.width)
+			{
+				cloud1->setPositionX(cloud2->getPositionX() - cloud2->getContentSize().width + 1);
+			}
+			if (cloud2->getPositionX() - cloud2->getContentSize().width/2 >= visibleSize.width)
+			{
+				cloud2->setPositionX(cloud1->getPositionX() - cloud1->getContentSize().width + 1);
+			}
+		}
+		// 风速 
+		windtime -= delta;
+		if (windtime <= 0)
+		{
+			randomWind();
+			windtime = 10;
+		}
+	}
+
+	// 箭靶运动暂停开始
+	if (ispause) {
+		for (auto target : targetVector)
+		{
+			target->pause();
+		}
+	}
+	else
+	{
+		for (auto target : targetVector)
+		{
+			target->resume();
+		}
+	}
+	
 	// 弓移动
 	if (!ispause)
 	{
@@ -211,7 +271,6 @@ void GameScene::update(float delta)
 			playerArrow.velocity.x -= resistx;
 		}
 
-		// 检测箭矢与箭靶碰撞
 		for (auto target : targetVector)
 		{
 			if (playerArrow.arrow->getBoundingBox().intersectsRect(target->getBoundingBox()))
@@ -222,7 +281,7 @@ void GameScene::update(float delta)
 				tmp->setScale(3);
 				this->addChild(tmp, 13);
 
-				CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("audio/hit.wav");
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/hit.wav");
 				// 箭矢重置
 				if (playerArrow.bonus == 0||playerArrow.bonus%3!=0)
 				{
@@ -281,7 +340,7 @@ void GameScene::update(float delta)
 				bonusLabel->setPosition(m_bow->getPosition() + Vec2(50, 25));
 				this->addChild(bonusLabel, 11);
 				bonusLabel->runAction(MoveBy::create(1.0f, Vec2(0, 50)));
-				CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("audio/bonus.mp3");
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/bonus.mp3");
 				bonusLabel->runAction(Sequence::create(
 					ScaleBy::create(1.0f, 2),
 					CallFunc::create(CC_CALLBACK_0(GameScene::flyout, this, bonusLabel)),
@@ -296,18 +355,23 @@ void GameScene::update(float delta)
 		time -= delta;
 		auto timeLabel = (Label*)this->getChildByName("timeLabel");
 		timeLabel->setString(StringUtils::format("%d", (int)time));
-		if (time <= 0)
-			ispause = true;
 	}
 	// 游戏结束
-	if(time<=0|| playerScore >= maxScore)
+	if((time<=0|| playerScore >= maxScore)&&!ispause)
 	{
 		auto gameoverLabel = (Label*)this->getChildByName("gameoverLabel");
 		if (playerScore >= maxScore)
 		{
+			CCLOG("WIN");
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/win.mp3");
 			gameoverLabel->setString("Success!");
-			gameoverLabel->setColor(Color3B::YELLOW);
+			gameoverLabel->setTextColor(Color4B::YELLOW);
 		}
+		else 
+		{
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/lose.mp3");
+		}
+		this->stopActionByTag(114);
 		gameoverLabel->setVisible(true);
 		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 25));
 		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setVisible(true);
@@ -400,10 +464,23 @@ void GameScene::addTarget()
 	else {
 		xx = TargetField3;
 	}
-	auto yy = random(100, 700);
+	double yy = random(100, 675);
 
+	// 箭靶随机运动
+	double vy1 = random(100, 675);
+	double vy2 = random(100, 675);
+	double t1 = random(0.75, 1.75);
+	double t2 = random(0.75, 1.75);
+
+	auto act = RepeatForever::create(
+		Sequence::create(
+			MoveTo::create(t1, Vec2(xx, vy1)),
+			MoveTo::create(t2, Vec2(xx, vy2)),
+			NULL
+		));
 	target->setPosition(xx, yy);
 	this->addChild(target, 5);
+	target->runAction(act);
 	this->targetVector.pushBack(target);
 }
 
@@ -421,11 +498,11 @@ void GameScene::flyout(Label* label) {
 void GameScene::randomWind()
 {
 	wind = random(-1, 1);
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/wind.mp3");
 	auto windLabel = (Label*)this->getChildByName("windLabel");
 	if (wind == 1)
 	{
 		windLabel->setString("<<<<<<");
-		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/wind.mp3");
 	}
 	else if (wind == 0)
 	{
@@ -434,7 +511,6 @@ void GameScene::randomWind()
 	else if (wind == -1)
 	{
 		windLabel->setString(">>>>>>");
-		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/wind.mp3");
 	}
 	CCLOG("wind:%d", wind);
 }
@@ -466,7 +542,7 @@ void GameScene::menuquitCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::Tou
 		ispause = true;
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/click2.wav");
 		this->getChildByName("gameUI")->getChildByName("pause_back_to_game")->setVisible(false);
-		this->getChildByName("gameUI")->getChildByName("textbox")->setVisible(false);
+		this->getChildByName("gameUI")->getChildByName("textbox")->setVisible(true);
 		this->getChildByName("gameUI")->getChildByName("quit_back_to_game")->setVisible(true);
 		this->getChildByName("gameUI")->getChildByName("quitLabel")->setVisible(true);
 		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setVisible(true);

@@ -18,7 +18,7 @@ struct ArrowState
 	Vec2 point1;   // 确定箭矢速度的起始点
 	Vec2 point2;   // 确定箭矢速度的终点
 	float maxV = 180;  //最大速度
-	int bonus = 0;
+	int bonus = 1;
 };
 
 #define TargetField1 750
@@ -56,6 +56,7 @@ private:
 	bool ispause;
 	double time;
 	int bow_move;
+	double windtime;
 };
 
 #endif // !_Game_Scene_H
