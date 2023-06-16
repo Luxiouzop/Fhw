@@ -121,6 +121,12 @@ bool GameScene::init()
 	addTarget();
 	addTarget();
 
+	// 地图
+	auto map = TMXTiledMap::create("background/backgroundMap.tmx");
+	map->setPosition(Vec2(0, 0));
+	this->addChild(map, 1);
+
+
 	// 鼠标回调
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
