@@ -1,5 +1,6 @@
-#ifndef _Game_Scene_H
-#define _Game_Scene_H
+#pragma once
+#ifndef _Game_Scene3_H
+#define _Game_Scene3_H
 
 #include "cocos2d.h"
 #include "cocostudio/CocoStudio.h"
@@ -11,17 +12,18 @@ using namespace cocos2d::ui;
 
 
 
+
 #define TargetField1 782
 #define TargetField2 878
 #define TargetField3 974
 
 
-class GameScene :public cocos2d::Scene
+class GameScene3 :public cocos2d::Scene
 {
 public:
 	static cocos2d::Scene* createScene(int s);
 	virtual bool init();
-	CREATE_FUNC(GameScene);
+	CREATE_FUNC(GameScene3);
 	void update(float delta);
 	void onTouchEnd(Touch* touch, Event* unused_event);
 	bool onTouchBegin(Touch* touch, Event* unused_event);
@@ -39,15 +41,15 @@ public:
 private:
 	Armature* m_bow;
 	struct ArrowState
-	{
-		Sprite* arrow;  // 箭矢精灵
-		bool islegal;  // 箭矢是否可用，可用为true
-		Vec2 velocity; // 箭矢速度
-		Vec2 point1;   // 确定箭矢速度的起始点
-		Vec2 point2;   // 确定箭矢速度的终点
-		float maxV = 180;  //最大速度
-		int bonus = 1;
-	};
+{
+	Sprite* arrow;  // 箭矢精灵
+	bool islegal;  // 箭矢是否可用，可用为true
+	Vec2 velocity; // 箭矢速度
+	Vec2 point1;   // 确定箭矢速度的起始点
+	Vec2 point2;   // 确定箭矢速度的终点
+	float maxV = 180;  //最大速度
+	int bonus = 1;
+};
 	ArrowState playerArrow;
 	int wind;
 	Vector<Sprite*> targetVector;
@@ -58,7 +60,6 @@ private:
 	int bow_move;
 	double windtime;
 	
-
 };
 
 #endif // !_Game_Scene_H

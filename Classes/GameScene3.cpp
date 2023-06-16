@@ -1,16 +1,16 @@
-#include "GameScene.h"
+#include "GameScene3.h"
 #include "MapScene.h"
 #include "SimpleAudioEngine.h"
 USING_NS_CC;
 
 
 
-Scene* GameScene::createScene(int s)
+Scene* GameScene3::createScene(int s)
 {
-	return GameScene::create();
+	return GameScene3::create();
 }
 
-bool GameScene::init()
+bool GameScene3::init()
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	// 音乐音效预加载
@@ -34,19 +34,19 @@ bool GameScene::init()
 	gameUI->getChildByName("sure_to_quit")->setVisible(false);
 	// 暂停按钮
 	auto pauseButton = (Button*)gameUI->getChildByName("pause_button");
-	pauseButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menupauseCallback, this));
+	pauseButton->addTouchEventListener(CC_CALLBACK_2(GameScene3::menupauseCallback, this));
 	// 暂停界面的返回按钮
 	auto pausetBackButton = (Button*)gameUI->getChildByName("pause_back_to_game");
-	pausetBackButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menubackCallback, this));
+	pausetBackButton->addTouchEventListener(CC_CALLBACK_2(GameScene3::menubackCallback, this));
 	// 退出按钮
 	auto quitButton = (Button*)gameUI->getChildByName("quit_button");
-	quitButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menuquitCallback, this));
+	quitButton->addTouchEventListener(CC_CALLBACK_2(GameScene3::menuquitCallback, this));
 	// 退出界面的返回按钮
 	auto quitBackButton = (Button*)gameUI->getChildByName("quit_back_to_game");
-	quitBackButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menubackCallback, this));
+	quitBackButton->addTouchEventListener(CC_CALLBACK_2(GameScene3::menubackCallback, this));
 	// 退出界面的确定按钮
 	auto quitSureButton = (Button*)gameUI->getChildByName("sure_to_quit");
-	quitSureButton->addTouchEventListener(CC_CALLBACK_2(GameScene::menuquitgameCallback, this));
+	quitSureButton->addTouchEventListener(CC_CALLBACK_2(GameScene3::menuquitgameCallback, this));
 	// 力度条
 	auto strengthBar = (LoadingBar*)gameUI->getChildByName("strength");
 	strengthBar->setPercent(0.0);
@@ -60,7 +60,7 @@ bool GameScene::init()
 	gameoverLabel->setVisible(false);
 	this->addChild(gameoverLabel, 12);
 	// 游戏帮助
-	auto tips = Label::createWithTTF(StringUtils::format("W/S: control bow up and down movement\nLeft mouse button pressed : the bow starts to build up power\nMouse movement : control the bow accumulation strength and shooting direction\nLeft mouse button release : shoot arrow\n\nThe arrow target will be fixed in this level"),
+	auto tips = Label::createWithTTF(StringUtils::format("W/S: control bow up and down movement\nLeft mouse button pressed : the bow starts to build up power\nMouse movement : control the bow accumulation strength and shooting direction\nLeft mouse button release : shoot arrow\n\nThere will be no penetrating arrows in this level"),
 		"fonts/arial.ttf", 20);
 	tips->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
 	tips->setName("tips");
@@ -135,9 +135,9 @@ bool GameScene::init()
 	// 鼠标回调
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
-	listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnd, this);
-	listener->onTouchBegan = CC_CALLBACK_2(GameScene::onTouchBegin, this);
-	listener->onTouchMoved = CC_CALLBACK_2(GameScene::onTouchMove, this);
+	listener->onTouchEnded = CC_CALLBACK_2(GameScene3::onTouchEnd, this);
+	listener->onTouchBegan = CC_CALLBACK_2(GameScene3::onTouchBegin, this);
+	listener->onTouchMoved = CC_CALLBACK_2(GameScene3::onTouchMove, this);
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 
 	// 键盘回调
@@ -158,7 +158,7 @@ bool GameScene::init()
 			}
 		}
 	};
-	keyListener->onKeyReleased= [&](EventKeyboard::KeyCode code, Event* e) {
+	keyListener->onKeyReleased = [&](EventKeyboard::KeyCode code, Event* e) {
 		if (!ispause) {
 			switch (code)
 			{
@@ -183,7 +183,7 @@ bool GameScene::init()
 	return true;
 }
 
-void GameScene::update(float delta)
+void GameScene3::update(float delta)
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -197,11 +197,11 @@ void GameScene::update(float delta)
 		{
 			cloud1->setPositionX(cloud1->getPositionX() - 0.25);
 			cloud2->setPositionX(cloud2->getPositionX() - 0.25);
-			if (cloud1->getPositionX() + cloud1->getContentSize().width/2 <= 0)
+			if (cloud1->getPositionX() + cloud1->getContentSize().width / 2 <= 0)
 			{
 				cloud1->setPositionX(cloud2->getPositionX() + cloud2->getContentSize().width - 1);
 			}
-			if (cloud2->getPositionX() + cloud2->getContentSize().width/2 <= 0)
+			if (cloud2->getPositionX() + cloud2->getContentSize().width / 2 <= 0)
 			{
 				cloud2->setPositionX(cloud1->getPositionX() + cloud1->getContentSize().width - 1);
 			}
@@ -210,11 +210,11 @@ void GameScene::update(float delta)
 		{
 			cloud1->setPositionX(cloud1->getPositionX() + 0.25);
 			cloud2->setPositionX(cloud2->getPositionX() + 0.25);
-			if (cloud1->getPositionX() - cloud1->getContentSize().width/2 >= visibleSize.width)
+			if (cloud1->getPositionX() - cloud1->getContentSize().width / 2 >= visibleSize.width)
 			{
 				cloud1->setPositionX(cloud2->getPositionX() - cloud2->getContentSize().width + 1);
 			}
-			if (cloud2->getPositionX() - cloud2->getContentSize().width/2 >= visibleSize.width)
+			if (cloud2->getPositionX() - cloud2->getContentSize().width / 2 >= visibleSize.width)
 			{
 				cloud2->setPositionX(cloud1->getPositionX() - cloud1->getContentSize().width + 1);
 			}
@@ -242,11 +242,11 @@ void GameScene::update(float delta)
 			target->resume();
 		}
 	}
-	
+
 	// 弓移动
 	if (!ispause)
 	{
-		if (bow_move == 1&&m_bow->getPositionY()+4<448)
+		if (bow_move == 1 && m_bow->getPositionY() + 4 < 448)
 		{
 			m_bow->setPositionY(m_bow->getPositionY() + 4);
 		}
@@ -257,7 +257,7 @@ void GameScene::update(float delta)
 	}
 
 	// 箭矢移动
-	if (playerArrow.islegal == false&&!ispause)
+	if (playerArrow.islegal == false && !ispause)
 	{
 		// 箭矢移动、旋转
 		playerArrow.arrow->setPosition(playerArrow.arrow->getPosition() + 0.1 * playerArrow.velocity);
@@ -266,10 +266,10 @@ void GameScene::update(float delta)
 		auto resisty = 0.00015 * pow(playerArrow.velocity.y, 2);
 		playerArrow.velocity.y -= 1.5 + resisty;
 		auto resistx = 0.00015 * pow(playerArrow.velocity.x, 2);
-		
+
 		//CCLOG("velocityx:%f", playerArrow.velocity.x);
 		//CCLOG("Resistx:%f", resistx);
-		if (playerArrow.velocity.x - resistx -wind > 0&&wind==1) 
+		if (playerArrow.velocity.x - resistx - wind > 0 && wind == 1)
 		{
 			playerArrow.velocity.x -= 1.25 * resistx;
 		}
@@ -294,13 +294,14 @@ void GameScene::update(float delta)
 
 				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/hit.wav");
 				// 箭矢重置
-				if (playerArrow.bonus == 0||playerArrow.bonus%3!=0)
+				if (playerArrow.bonus == 0 || playerArrow.bonus % 3 != 0)
 				{
 					playerArrow.arrow->setVisible(false);
 					playerArrow.arrow->setPosition(m_bow->getPosition());
 					playerArrow.islegal = true;
-					playerArrow.bonus++;
-					if (playerArrow.bonus % 3 == 0) {
+					//playerArrow.bonus++;
+					
+					/*if (playerArrow.bonus % 3 == 0) {
 						auto bonusLabel = Label::createWithTTF(StringUtils::format("Bonus!"), "fonts/Marker Felt.ttf", 30);
 						bonusLabel->setPosition(m_bow->getPosition() + Vec2(50, 25));
 						this->addChild(bonusLabel, 11);
@@ -308,30 +309,30 @@ void GameScene::update(float delta)
 						CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("audio/bonus.mp3");
 						bonusLabel->runAction(Sequence::create(
 							ScaleBy::create(1.0f, 2),
-							CallFunc::create(CC_CALLBACK_0(GameScene::flyout, this, bonusLabel)),
+							CallFunc::create(CC_CALLBACK_0(GameScene3::flyout, this, bonusLabel)),
 							NULL
 						));
-					}
+					}*/
 				}
-				
+
 				// 得分增加
 				auto score = 0;
-				if (abs(target->getPositionX() - TargetField1)<0.01)
+				if (abs(target->getPositionX() - TargetField1) < 0.01)
 					score = 1;
 				else if (abs(target->getPositionX() - TargetField2) < 0.01)
 					score = 2;
 				else if (abs(target->getPositionX() - TargetField3) < 0.01)
 					score = 3;
-				showScoreTips(score, target->getPosition(),Color4B::GREEN);
+				showScoreTips(score, target->getPosition(), Color4B::GREEN);
 				auto scoreLabel = (Label*)this->getChildByName("scoreLabel");
 				scoreLabel->setString(StringUtils::format("Score:%d (Target:%d)", playerScore, maxScore));
 				// 箭靶命中后消失
-				auto actionDown = CallFunc::create(CC_CALLBACK_0(GameScene::removeTarget, this, target));
+				auto actionDown = CallFunc::create(CC_CALLBACK_0(GameScene3::removeTarget, this, target));
 				target->runAction(actionDown);
 				tmp->removeFromParent();
 
 				// 箭靶增加
-				auto actionAdd = CallFunc::create(CC_CALLBACK_0(GameScene::addTarget, this));
+				auto actionAdd = CallFunc::create(CC_CALLBACK_0(GameScene3::addTarget, this));
 				auto sequence = Sequence::create(DelayTime::create(0.75), actionAdd, nullptr);
 				this->runAction(sequence);
 
@@ -339,14 +340,14 @@ void GameScene::update(float delta)
 		}
 
 		// 检测箭矢越界
-		if (playerArrow.arrow->getPositionX() > visibleSize.width||playerArrow.arrow->getPositionX()<0
-			||playerArrow.arrow->getPositionY()<0||playerArrow.arrow->getPositionY()>1500)
+		if (playerArrow.arrow->getPositionX() > visibleSize.width || playerArrow.arrow->getPositionX() < 0
+			|| playerArrow.arrow->getPositionY() < 0 || playerArrow.arrow->getPositionY() > 1500)
 		{
 			playerArrow.arrow->setVisible(false);
 			playerArrow.arrow->setPosition(m_bow->getPosition());
 			playerArrow.islegal = true;
-			playerArrow.bonus++;
-			if (playerArrow.bonus % 3 == 0) {
+			//playerArrow.bonus++;
+			/*if (playerArrow.bonus % 3 == 0) {
 				auto bonusLabel = Label::createWithTTF(StringUtils::format("Bonus!"), "fonts/Marker Felt.ttf", 30);
 				bonusLabel->setPosition(m_bow->getPosition() + Vec2(50, 25));
 				this->addChild(bonusLabel, 11);
@@ -354,21 +355,21 @@ void GameScene::update(float delta)
 				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/bonus.mp3");
 				bonusLabel->runAction(Sequence::create(
 					ScaleBy::create(1.0f, 2),
-					CallFunc::create(CC_CALLBACK_0(GameScene::flyout, this, bonusLabel)),
+					CallFunc::create(CC_CALLBACK_0(GameScene3::flyout, this, bonusLabel)),
 					NULL
 				));
-			}
+			}*/
 		}
 	}
 	// 倒计时
-	if (!ispause) 
+	if (!ispause)
 	{
 		time -= delta;
 		auto timeLabel = (Label*)this->getChildByName("timeLabel");
 		timeLabel->setString(StringUtils::format("%d", (int)time));
 	}
 	// 游戏结束
-	if((time<=0|| playerScore >= maxScore)&&!ispause)
+	if ((time <= 0 || playerScore >= maxScore) && !ispause)
 	{
 		auto gameoverLabel = (Label*)this->getChildByName("gameoverLabel");
 		if (playerScore >= maxScore)
@@ -378,7 +379,7 @@ void GameScene::update(float delta)
 			gameoverLabel->setString("Success!");
 			gameoverLabel->setTextColor(Color4B::YELLOW);
 		}
-		else 
+		else
 		{
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/lose.mp3");
 		}
@@ -391,9 +392,9 @@ void GameScene::update(float delta)
 
 }
 
-void GameScene::onTouchEnd(Touch* touch, Event* unused_event)
+void GameScene3::onTouchEnd(Touch* touch, Event* unused_event)
 {
-	if (playerArrow.islegal == true&&!ispause)
+	if (playerArrow.islegal == true && !ispause)
 	{
 		CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("audio/shoot2.wav");
 		playerArrow.point2 = touch->getLocation();
@@ -402,7 +403,7 @@ void GameScene::onTouchEnd(Touch* touch, Event* unused_event)
 		if (len > playerArrow.maxV) {
 			len = playerArrow.maxV;
 		}
-		playerArrow.velocity = playerArrow.velocity.getNormalized() * (len+20);
+		playerArrow.velocity = playerArrow.velocity.getNormalized() * (len + 20);
 		CCLOG("%f,%f", playerArrow.velocity.x, playerArrow.velocity.y);
 		playerArrow.islegal = false;
 		playerArrow.arrow->setPosition(m_bow->getPosition());
@@ -413,9 +414,9 @@ void GameScene::onTouchEnd(Touch* touch, Event* unused_event)
 	}
 }
 
-bool GameScene::onTouchBegin(Touch* touch, Event* unused_event)
+bool GameScene3::onTouchBegin(Touch* touch, Event* unused_event)
 {
-	if (playerArrow.islegal == true&&!ispause)
+	if (playerArrow.islegal == true && !ispause)
 	{
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/pull_bow.wav");
 		playerArrow.point1 = touch->getLocation();
@@ -431,21 +432,21 @@ bool GameScene::onTouchBegin(Touch* touch, Event* unused_event)
 		label->setPosition(touch->getLocation());
 		label->runAction(Sequence::create(
 			DelayTime::create(0.5),
-			CallFunc::create(CC_CALLBACK_0(GameScene::flyout, this, label)),
+			CallFunc::create(CC_CALLBACK_0(GameScene3::flyout, this, label)),
 			NULL
 		));
 		return false;
 	}
-	else 
+	else
 	{
 		return false;
 	}
-	
+
 }
 
-void GameScene::onTouchMove(Touch* touch, Event* unused_event)
+void GameScene3::onTouchMove(Touch* touch, Event* unused_event)
 {
-	if (playerArrow.islegal == true&&!ispause)
+	if (playerArrow.islegal == true && !ispause)
 	{
 		auto point = touch->getLocation();
 		auto strength = (playerArrow.point1 - point).getLength();
@@ -454,12 +455,12 @@ void GameScene::onTouchMove(Touch* touch, Event* unused_event)
 			strength = 100;
 		auto strengthBar = (LoadingBar*)this->getChildByName("gameUI")->getChildByName("strength");
 		strengthBar->setPercent(strength);
-		
+
 		m_bow->setRotation(-CC_RADIANS_TO_DEGREES((playerArrow.point1 - point).getAngle()));
 	}
 }
 
-void GameScene::addTarget()
+void GameScene3::addTarget()
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto target = Sprite::create("target1.png");
@@ -479,34 +480,34 @@ void GameScene::addTarget()
 
 	target->setPosition(xx, yy);
 	this->addChild(target, 5);
-    /*// 箭靶随机运动
+	// 箭靶随机运动
 	double vy1 = random(100, 675);
 	double vy2 = random(100, 675);
-	double t1 = random(0.75, 1.75);
-	double t2 = random(0.75, 1.75);
+	double t1 = random(0.75, 1.0);
+	double t2 = random(0.75, 1.0);
 	auto act = RepeatForever::create(
 		Sequence::create(
 			MoveTo::create(t1, Vec2(xx, vy1)),
 			MoveTo::create(t2, Vec2(xx, vy2)),
 			NULL
 		));
-	target->runAction(act);*/
+	target->runAction(act);
 
 	this->targetVector.pushBack(target);
 }
 
-void GameScene::removeTarget(Sprite* target)
+void GameScene3::removeTarget(Sprite* target)
 {
 	this->removeChild(target);
 	targetVector.eraseObject(target);
 }
 
-void GameScene::flyout(Label* label) {
+void GameScene3::flyout(Label* label) {
 	label->setVisible(false);
 	label->removeFromParent();
 }
 
-void GameScene::randomWind()
+void GameScene3::randomWind()
 {
 	wind = random(-1, 1);
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/wind.mp3");
@@ -526,7 +527,7 @@ void GameScene::randomWind()
 	CCLOG("wind:%d", wind);
 }
 
-void GameScene::showScoreTips(int score,Vec2 position,Color4B color)
+void GameScene3::showScoreTips(int score, Vec2 position, Color4B color)
 {
 	playerScore += score;
 	auto label = Label::createWithTTF(StringUtils::format("+%d", score), "fonts/Marker Felt.ttf", 24);
@@ -535,13 +536,13 @@ void GameScene::showScoreTips(int score,Vec2 position,Color4B color)
 	this->addChild(label, 12);
 	label->runAction(Sequence::create(
 		MoveBy::create(0.75f, Vec2(0, 30)),
-		CallFunc::create(CC_CALLBACK_0(GameScene::flyout, this, label)),
+		CallFunc::create(CC_CALLBACK_0(GameScene3::flyout, this, label)),
 		NULL
 	));
 }
 
 
-void GameScene::menuquitCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+void GameScene3::menuquitCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
 {
 	switch (type)
 	{
@@ -566,7 +567,7 @@ void GameScene::menuquitCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::Tou
 	}
 }
 
-void GameScene::menupauseCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+void GameScene3::menupauseCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
 {
 	switch (type)
 	{
@@ -591,7 +592,7 @@ void GameScene::menupauseCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::To
 	}
 }
 
-void GameScene::menubackCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+void GameScene3::menubackCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
 {
 	switch (type)
 	{
@@ -616,7 +617,7 @@ void GameScene::menubackCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::Tou
 	}
 }
 
-void GameScene::menuquitgameCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+void GameScene3::menuquitgameCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
 {
 	switch (type)
 	{

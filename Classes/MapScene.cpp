@@ -1,6 +1,8 @@
 #include "MapScene.h"
 #include "HelloWorldScene.h"
 #include "GameScene.h"
+#include "GameScene2.h"
+#include "GameScene3.h"
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
 #include "cocostudio/CocoStudio.h"
@@ -32,6 +34,10 @@ bool MapScene::init()
 
 	auto map1Button = (Button*)mapUI->getChildByName("map1_button");
 	map1Button->addTouchEventListener(CC_CALLBACK_2(MapScene::menuMap1Callback, this));
+	auto map2Button = (Button*)mapUI->getChildByName("map2_button");
+	map2Button->addTouchEventListener(CC_CALLBACK_2(MapScene::menuMap2Callback, this));
+	auto map3Button = (Button*)mapUI->getChildByName("map3_button");
+	map3Button->addTouchEventListener(CC_CALLBACK_2(MapScene::menuMap3Callback, this));
 
 	return true;
 }
@@ -70,6 +76,44 @@ void MapScene::menuMap1Callback(cocos2d::Ref* pSender, cocos2d::ui::Widget::Touc
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/map_choose.wav");
 		Director::getInstance()->replaceScene(TransitionFade::create(0.75, GameScene::createScene(1)));
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void MapScene::menuMap2Callback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/map_choose.wav");
+		Director::getInstance()->replaceScene(TransitionFade::create(0.75, GameScene2::createScene(1)));
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void MapScene::menuMap3Callback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/map_choose.wav");
+		Director::getInstance()->replaceScene(TransitionFade::create(0.75, GameScene3::createScene(1)));
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
 		break;

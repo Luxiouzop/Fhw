@@ -15,6 +15,8 @@ public:
 
 	void menuBackCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
 	void menuMap1Callback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
+	void menuMap2Callback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
+	void menuMap3Callback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
 };
 
 #endif // !_Map_Scene_H
