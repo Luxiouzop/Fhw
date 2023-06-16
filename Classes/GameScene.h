@@ -21,9 +21,9 @@ struct ArrowState
 	int bonus = 1;
 };
 
-#define TargetField1 750
-#define TargetField2 850
-#define TargetField3 950
+#define TargetField1 782
+#define TargetField2 878
+#define TargetField3 974
 
 
 class GameScene :public cocos2d::Scene

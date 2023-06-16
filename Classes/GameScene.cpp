@@ -66,7 +66,7 @@ bool GameScene::init()
 	m_bow = Armature::create("bow");
 	this->addChild(m_bow, 10);
 	m_bow->setScale(0.05);
-	m_bow->setPosition(Vec2(100, 64));
+	m_bow->setPosition(Vec2(100, 82));
 	//m_bow->getAnimation()->play("ready");
 
 	// ¼ýÊ¸
@@ -241,11 +241,11 @@ void GameScene::update(float delta)
 	// ¹­ÒÆ¶¯
 	if (!ispause)
 	{
-		if (bow_move == 1&&m_bow->getPositionY()+4<475)
+		if (bow_move == 1&&m_bow->getPositionY()+4<448)
 		{
 			m_bow->setPositionY(m_bow->getPositionY() + 4);
 		}
-		else if (bow_move == -1 && m_bow->getPositionY() - 4 > 64)
+		else if (bow_move == -1 && m_bow->getPositionY() - 4 > 82)
 		{
 			m_bow->setPositionY(m_bow->getPositionY() - 4);
 		}
