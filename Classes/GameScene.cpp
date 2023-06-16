@@ -54,7 +54,7 @@ bool GameScene::init()
 	// 游戏暂停标志
 	ispause = true;
 	// 游戏结束标签
-	auto gameoverLabel = Label::createWithTTF(StringUtils::format("Game over!"), "fonts/arial.ttf", 64);
+	auto gameoverLabel = Label::createWithTTF(StringUtils::format("Game over!"), "fonts/Marker Felt.ttf", 64);
 	gameoverLabel->setTextColor(Color4B::RED);
 	gameoverLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 + 100));
 	gameoverLabel->setName("gameoverLabel");
@@ -290,7 +290,7 @@ void GameScene::update(float delta)
 					playerArrow.islegal = true;
 					playerArrow.bonus++;
 					if (playerArrow.bonus % 3 == 0) {
-						auto bonusLabel = Label::createWithTTF(StringUtils::format("Bonus!"), "fonts/arial.ttf", 30);
+						auto bonusLabel = Label::createWithTTF(StringUtils::format("Bonus!"), "fonts/Marker Felt.ttf", 30);
 						bonusLabel->setPosition(m_bow->getPosition() + Vec2(50, 25));
 						this->addChild(bonusLabel, 11);
 						bonusLabel->runAction(MoveBy::create(1.0f, Vec2(0, 50)));
@@ -336,7 +336,7 @@ void GameScene::update(float delta)
 			playerArrow.islegal = true;
 			playerArrow.bonus++;
 			if (playerArrow.bonus % 3 == 0) {
-				auto bonusLabel = Label::createWithTTF(StringUtils::format("Bonus!"), "fonts/arial.ttf", 30);
+				auto bonusLabel = Label::createWithTTF(StringUtils::format("Bonus!"), "fonts/Marker Felt.ttf", 30);
 				bonusLabel->setPosition(m_bow->getPosition() + Vec2(50, 25));
 				this->addChild(bonusLabel, 11);
 				bonusLabel->runAction(MoveBy::create(1.0f, Vec2(0, 50)));
