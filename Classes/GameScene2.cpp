@@ -369,6 +369,8 @@ void GameScene2::update(float delta)
 	// ÓÎÏ·½áÊø
 	if ((time <= 0 || playerScore >= maxScore) && !ispause)
 	{
+		this->getChildByName("gameUI")->getChildByName("pause_button")->setVisible(false);
+		this->getChildByName("gameUI")->getChildByName("quit_button")->setVisible(false);
 		auto gameoverLabel = (Label*)this->getChildByName("gameoverLabel");
 		if (playerScore >= maxScore)
 		{

@@ -23,7 +23,10 @@ bool GameScene::init()
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/error.mp3");
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/win.mp3");
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/lose.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("audio/frontMusic.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("audio/inGame.mp3");
 	// UI界面
+	CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("audio/frontMusic.mp3", true);
 	auto gameUI = GUIReader::getInstance()->widgetFromJsonFile("gaming/gaming_1.json");
 	this->addChild(gameUI, 12);
 	gameUI->setName("gameUI");
@@ -370,16 +373,20 @@ void GameScene::update(float delta)
 	// 游戏结束
 	if((time<=0|| playerScore >= maxScore)&&!ispause)
 	{
+		this->getChildByName("gameUI")->getChildByName("pause_button")->setVisible(false);
+		this->getChildByName("gameUI")->getChildByName("quit_button")->setVisible(false);
 		auto gameoverLabel = (Label*)this->getChildByName("gameoverLabel");
 		if (playerScore >= maxScore)
 		{
 			CCLOG("WIN");
+			CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic("audio/frontMusic.mp3");
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/win.mp3");
 			gameoverLabel->setString("Success!");
 			gameoverLabel->setTextColor(Color4B::YELLOW);
 		}
 		else 
 		{
+			CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic("audio/frontMusic.mp3");
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/lose.mp3");
 		}
 		this->stopActionByTag(114);

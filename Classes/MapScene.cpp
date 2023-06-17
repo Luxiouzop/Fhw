@@ -25,8 +25,10 @@ bool MapScene::init()
 	}
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/click2.wav");
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/map_choose.wav");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("audio/chooseLevel.mp3");
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
+	CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("audio/chooseLevel.mp3",true);
 	auto mapUI = GUIReader::getInstance()->widgetFromJsonFile("Map/Map.json");
 	this->addChild(mapUI, 1);
 	auto backButton = (Button*)mapUI->getChildByName("back_button");

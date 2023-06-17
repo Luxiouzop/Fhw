@@ -122,8 +122,10 @@ bool HelloWorld::init()
     }*/
 
     CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/click2.wav");
+    CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("audio/inGame.mp3");
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
+    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("audio/inGame.mp3", true);
     auto startUI = GUIReader::getInstance()->widgetFromJsonFile("LOGIN/LOGIN.json");
     //startUI->setPosition(Vec2(259, 159));
     startUI->setName("startUI");
