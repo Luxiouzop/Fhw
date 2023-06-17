@@ -23,6 +23,9 @@ bool GameScene3::init()
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/error.mp3");
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/win.mp3");
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/lose.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("audio/frontMusic.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("audio/inGame.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("audio/frontMusic.mp3", true);
 	// UI界面
 	auto gameUI = GUIReader::getInstance()->widgetFromJsonFile("gaming/gaming_1.json");
 	this->addChild(gameUI, 12);
@@ -74,6 +77,11 @@ bool GameScene3::init()
 	m_bow->setPosition(Vec2(100, 82));
 	//m_bow->getAnimation()->play("ready");
 
+	e_bow = Armature::create("bow");
+	this->addChild(e_bow, 10);
+	e_bow->setScale(0.05);
+	e_bow->setPosition(Vec2(100, 82));
+
 	// 箭矢
 	playerArrow.arrow = Sprite::create("jian.png");
 	playerArrow.arrow->setScale(0.1, 0.1);
@@ -82,6 +90,15 @@ bool GameScene3::init()
 	playerArrow.arrow->setPosition(m_bow->getPosition());
 	this->addChild(playerArrow.arrow, 9);
 	playerArrow.arrow->setVisible(false);
+
+	AIArrow.arrow = Sprite::create("jian.png");
+	AIArrow.arrow->setScale(0.1);
+	AIArrow.islegal = true;
+	AIArrow.arrow->setName("AIarrow");
+	AIArrow.arrow->setPosition(e_bow->getPosition());
+	this->addChild(AIArrow.arrow, 9);
+	AIArrow.arrow->setVisible(false);
+
 
 	// 风速
 	wind = 0;
@@ -125,6 +142,16 @@ bool GameScene3::init()
 	addTarget();
 	addTarget();
 	addTarget();
+
+	// AI
+	auto ss = Sequence::create(
+		CallFunc::create(CC_CALLBACK_0(GameScene3::findTarget, this)),
+		DelayTime::create(2.0),
+		NULL
+	);
+	auto s = RepeatForever::create(ss);
+	e_bow->runAction(s);
+
 
 	// 地图
 	auto map = TMXTiledMap::create("background/backgroundMap.tmx");
@@ -192,7 +219,7 @@ void GameScene3::update(float delta)
 	{
 		auto cloud1 = this->getChildByName("cloud1");
 		auto cloud2 = this->getChildByName("cloud2");
-		CCLOG("cloud1x:%f,cloud2x:%f", cloud1->getPositionX(), cloud2->getPositionX());
+		//CCLOG("cloud1x:%f,cloud2x:%f", cloud1->getPositionX(), cloud2->getPositionX());
 		if (wind == 1)//<<<<<
 		{
 			cloud1->setPositionX(cloud1->getPositionX() - 0.25);
@@ -385,6 +412,7 @@ void GameScene3::update(float delta)
 		{
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/lose.mp3");
 		}
+		CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic("audio/frontMusic.mp3");
 		this->stopActionByTag(114);
 		gameoverLabel->setVisible(true);
 		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 25));
@@ -636,5 +664,25 @@ void GameScene3::menuquitgameCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget
 	default:
 		break;
 	}
+}
+
+void GameScene3::findTarget()
+{
+	targetLoc = targetVector.at(0)->getPosition();
+	//targetLoc.x = e_bow->getPositionX();
+	targetLoc.x = 100;
+	if (targetLoc.y >= 448)
+	{
+		targetLoc.y = 448;
+	}
+	CCLOG("loc:%f,%f", targetLoc.x, targetLoc.y);
+	CCLOG("bow:%f,%f", e_bow->getPositionX(), e_bow->getPositionY());
+	e_bow->getAnimation()->play("ready");
+	e_bow->runAction(MoveTo::create(1.5, targetLoc));
+}
+
+void GameScene3::shootArrow()
+{
+	e_bow->getAnimation()->play("reset");
 }
 

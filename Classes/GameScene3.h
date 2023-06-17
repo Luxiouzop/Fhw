@@ -2,6 +2,8 @@
 #ifndef _Game_Scene3_H
 #define _Game_Scene3_H
 
+//#include"AImanager.h"
+
 #include "cocos2d.h"
 #include "cocostudio/CocoStudio.h"
 #include "ui/CocosGUI.h"
@@ -37,10 +39,11 @@ public:
 	void menupauseCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
 	void menubackCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
 	void menuquitgameCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
+	void findTarget();
+	void shootArrow();
 
-private:
-	Armature* m_bow;
-	struct ArrowState
+
+struct ArrowState
 {
 	Sprite* arrow;  // 箭矢精灵
 	bool islegal;  // 箭矢是否可用，可用为true
@@ -50,7 +53,12 @@ private:
 	float maxV = 180;  //最大速度
 	int bonus = 1;
 };
+private:
+	Armature* m_bow;
+	Armature* e_bow;
+	
 	ArrowState playerArrow;
+	ArrowState AIArrow;
 	int wind;
 	Vector<Sprite*> targetVector;
 	int playerScore;
@@ -59,6 +67,7 @@ private:
 	double time;
 	int bow_move;
 	double windtime;
+	Vec2 targetLoc;
 	
 };
 

@@ -22,6 +22,9 @@ bool GameScene2::init()
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/error.mp3");
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/win.mp3");
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("audio/lose.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("audio/frontMusic.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("audio/inGame.mp3");
+	CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("audio/frontMusic.mp3", true);
 	// UI½çÃæ
 	auto gameUI = GUIReader::getInstance()->widgetFromJsonFile("gaming/gaming_1.json");
 	this->addChild(gameUI, 12);
@@ -191,7 +194,7 @@ void GameScene2::update(float delta)
 	{
 		auto cloud1 = this->getChildByName("cloud1");
 		auto cloud2 = this->getChildByName("cloud2");
-		CCLOG("cloud1x:%f,cloud2x:%f", cloud1->getPositionX(), cloud2->getPositionX());
+		//CCLOG("cloud1x:%f,cloud2x:%f", cloud1->getPositionX(), cloud2->getPositionX());
 		if (wind == 1)//<<<<<
 		{
 			cloud1->setPositionX(cloud1->getPositionX() - 0.25);
@@ -383,6 +386,7 @@ void GameScene2::update(float delta)
 		{
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/lose.mp3");
 		}
+		CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic("audio/frontMusic.mp3");
 		this->stopActionByTag(114);
 		gameoverLabel->setVisible(true);
 		this->getChildByName("gameUI")->getChildByName("sure_to_quit")->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 - 25));

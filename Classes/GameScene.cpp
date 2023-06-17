@@ -195,7 +195,7 @@ void GameScene::update(float delta)
 	{
 		auto cloud1 = this->getChildByName("cloud1");
 		auto cloud2 = this->getChildByName("cloud2");
-		CCLOG("cloud1x:%f,cloud2x:%f", cloud1->getPositionX(), cloud2->getPositionX());
+		//CCLOG("cloud1x:%f,cloud2x:%f", cloud1->getPositionX(), cloud2->getPositionX());
 		if (wind == 1)//<<<<<
 		{
 			cloud1->setPositionX(cloud1->getPositionX() - 0.25);
