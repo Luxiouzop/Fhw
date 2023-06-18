@@ -109,7 +109,7 @@ bool GameScene::init()
 
 	// µÃ·Ö
 	playerScore = 0;
-	maxScore = 25;
+	maxScore = 20;
 	auto scoreLabel = Label::createWithTTF(StringUtils::format("Score:%d (Target:%d)", playerScore, maxScore), "fonts/arial.ttf", 24);
 	scoreLabel->setName("scoreLabel");
 	scoreLabel->setPosition(Vec2(150, visibleSize.height - 150));
@@ -124,6 +124,8 @@ bool GameScene::init()
 	this->addChild(timeLabel, 11);
 
 	// ¼ý°Ð
+	addTarget();
+	addTarget();
 	addTarget();
 	addTarget();
 	addTarget();

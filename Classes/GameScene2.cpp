@@ -127,6 +127,7 @@ bool GameScene2::init()
 	addTarget();
 	addTarget();
 	addTarget();
+	addTarget();
 
 	// µØÍ¼
 	auto map = TMXTiledMap::create("background/backgroundMap.tmx");

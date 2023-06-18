@@ -41,6 +41,7 @@ public:
 	void menuquitgameCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget::TouchEventType type);
 	void findTarget();
 	void shootArrow();
+	void shootEnd();
 
 
 struct ArrowState

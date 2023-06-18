@@ -123,7 +123,7 @@ bool GameScene3::init()
 
 	// 得分
 	playerScore = 0;
-	maxScore = 25;
+	maxScore = 22;
 	auto scoreLabel = Label::createWithTTF(StringUtils::format("Score:%d (Target:%d)", playerScore, maxScore), "fonts/arial.ttf", 24);
 	scoreLabel->setName("scoreLabel");
 	scoreLabel->setPosition(Vec2(150, visibleSize.height - 150));
@@ -145,8 +145,12 @@ bool GameScene3::init()
 
 	// AI
 	auto ss = Sequence::create(
+		DelayTime::create(0.25),
 		CallFunc::create(CC_CALLBACK_0(GameScene3::findTarget, this)),
 		DelayTime::create(2.0),
+		CallFunc::create(CC_CALLBACK_0(GameScene3::shootArrow,this)),
+		DelayTime::create(0.55),
+		CallFunc::create(CC_CALLBACK_0(GameScene3::shootEnd,this)),
 		NULL
 	);
 	auto s = RepeatForever::create(ss);
@@ -261,6 +265,7 @@ void GameScene3::update(float delta)
 		{
 			target->pause();
 		}
+		e_bow->pause();
 	}
 	else
 	{
@@ -268,6 +273,7 @@ void GameScene3::update(float delta)
 		{
 			target->resume();
 		}
+		e_bow->resume();
 	}
 
 	// 弓移动
@@ -388,6 +394,95 @@ void GameScene3::update(float delta)
 			}*/
 		}
 	}
+
+	// AI箭矢移动
+	if (AIArrow.islegal == false && !ispause)
+	{
+		// 箭矢移动、旋转
+		AIArrow.arrow->setPosition(AIArrow.arrow->getPosition() + 0.1 * AIArrow.velocity);
+		AIArrow.arrow->setRotation(-CC_RADIANS_TO_DEGREES(AIArrow.velocity.getAngle()));
+		// 每次更新根据 风向、重力 修正速度
+		auto resisty = 0.00015 * pow(AIArrow.velocity.y, 2);
+		AIArrow.velocity.y -= 1.5 + resisty;
+		auto resistx = 0.00015 * pow(AIArrow.velocity.x, 2);
+
+		//CCLOG("velocityx:%f", playerArrow.velocity.x);
+		//CCLOG("Resistx:%f", resistx);
+		if (AIArrow.velocity.x - resistx - wind > 0 && wind == 1)
+		{
+			AIArrow.velocity.x -= 1.25 * resistx;
+		}
+		else if (wind == -1)
+		{
+			AIArrow.velocity.x -= 0.75 * resistx;
+		}
+		else if (wind == 0)
+		{
+			AIArrow.velocity.x -= resistx;
+		}
+
+		for (auto target : targetVector)
+		{
+			if (AIArrow.arrow->getBoundingBox().intersectsRect(target->getBoundingBox()))
+			{
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/hit.wav");
+				// 箭矢重置
+				if (AIArrow.bonus == 0 || AIArrow.bonus % 3 != 0)
+				{
+					AIArrow.arrow->setVisible(false);
+					AIArrow.arrow->setPosition(e_bow->getPosition());
+					AIArrow.islegal = true;
+					//playerArrow.bonus++;
+
+					/*if (playerArrow.bonus % 3 == 0) {
+						auto bonusLabel = Label::createWithTTF(StringUtils::format("Bonus!"), "fonts/Marker Felt.ttf", 30);
+						bonusLabel->setPosition(m_bow->getPosition() + Vec2(50, 25));
+						this->addChild(bonusLabel, 11);
+						bonusLabel->runAction(MoveBy::create(1.0f, Vec2(0, 50)));
+						CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("audio/bonus.mp3");
+						bonusLabel->runAction(Sequence::create(
+							ScaleBy::create(1.0f, 2),
+							CallFunc::create(CC_CALLBACK_0(GameScene3::flyout, this, bonusLabel)),
+							NULL
+						));
+					}*/
+				}
+
+				// 箭靶命中后消失
+				auto actionDown = CallFunc::create(CC_CALLBACK_0(GameScene3::removeTarget, this, target));
+				target->runAction(actionDown);
+
+				// 箭靶增加
+				auto actionAdd = CallFunc::create(CC_CALLBACK_0(GameScene3::addTarget, this));
+				auto sequence = Sequence::create(DelayTime::create(0.75), actionAdd, nullptr);
+				this->runAction(sequence);
+
+			}
+		}
+
+		// 检测箭矢越界
+		if (AIArrow.arrow->getPositionX() > visibleSize.width || AIArrow.arrow->getPositionX() < 0
+			|| AIArrow.arrow->getPositionY() < 0 || AIArrow.arrow->getPositionY() > 1500)
+		{
+			AIArrow.arrow->setVisible(false);
+			AIArrow.arrow->setPosition(e_bow->getPosition());
+			AIArrow.islegal = true;
+			//playerArrow.bonus++;
+			/*if (playerArrow.bonus % 3 == 0) {
+				auto bonusLabel = Label::createWithTTF(StringUtils::format("Bonus!"), "fonts/Marker Felt.ttf", 30);
+				bonusLabel->setPosition(m_bow->getPosition() + Vec2(50, 25));
+				this->addChild(bonusLabel, 11);
+				bonusLabel->runAction(MoveBy::create(1.0f, Vec2(0, 50)));
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/bonus.mp3");
+				bonusLabel->runAction(Sequence::create(
+					ScaleBy::create(1.0f, 2),
+					CallFunc::create(CC_CALLBACK_0(GameScene3::flyout, this, bonusLabel)),
+					NULL
+				));
+			}*/
+		}
+	}
+
 	// 倒计时
 	if (!ispause)
 	{
@@ -668,7 +763,9 @@ void GameScene3::menuquitgameCallback(cocos2d::Ref* pSender, cocos2d::ui::Widget
 
 void GameScene3::findTarget()
 {
-	targetLoc = targetVector.at(0)->getPosition();
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("audio/pull_bow.wav");
+	int c = targetVector.size() - 1;
+	targetLoc = targetVector.at(random(0, c))->getPosition();
 	//targetLoc.x = e_bow->getPositionX();
 	targetLoc.x = 100;
 	if (targetLoc.y >= 448)
@@ -683,6 +780,25 @@ void GameScene3::findTarget()
 
 void GameScene3::shootArrow()
 {
+	
+	AIArrow.arrow->setPosition(e_bow->getPosition());
+	//AIArrow.islegal = false;
+	int c = targetVector.size()-1;
+	auto loc = targetVector.at(random(0, c))->getPosition();
+	loc -= e_bow->getPosition();
+	loc.y += random(35, 75);
+	loc = loc.getNormalized() * random(180, 200);
+	AIArrow.velocity = loc;
+	auto rot=(-CC_RADIANS_TO_DEGREES((AIArrow.velocity).getAngle()));
+	//AIArrow.arrow->setVisible(true);
+	e_bow->runAction(RotateTo::create(0.5, rot));
+}
+
+void GameScene3::shootEnd()
+{
 	e_bow->getAnimation()->play("reset");
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("audio/shoot2.wav");
+	AIArrow.arrow->setVisible(true);
+	AIArrow.islegal = false;
 }
 
